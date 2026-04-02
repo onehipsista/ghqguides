@@ -1,0 +1,239 @@
+import { useState, useMemo } from "react";
+import { Search } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { Layout } from "@/components/Layout";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { MistakeCard } from "@/components/MistakeCard";
+import { MistakeModal } from "@/components/MistakeModal";
+import { CATEGORIES } from "@/lib/mock-data";
+import { getPublicIssues } from "@/lib/design-issues";
+import { getAccessState } from "@/lib/access";
+import { createCheckoutSession } from "@/lib/billing";
+import { guideAccessPriceLabel } from "@/lib/app-config";
+import type { DesignIssue, Severity } from "@/types/design-issue";
+import { cn } from "@/lib/utils";
+
+const FREE_CARD_LIMIT = 8;
+const SEVERITY_FILTERS: Array<{ label: string; value: Severity | "all" }> = [
+  { label: "All", value: "all" },
+  { label: "Minor", value: "minor" },
+  { label: "Moderate", value: "moderate" },
+  { label: "Major", value: "major" },
+];
+
+export default function MistakesPage() {
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All Categories");
+  const [severity, setSeverity] = useState<Severity | "all">("all");
+  const [selected, setSelected] = useState<DesignIssue | null>(null);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["public-issues"],
+    queryFn: getPublicIssues,
+  });
+
+  const { data: accessState } = useQuery({
+    queryKey: ["access-state"],
+    queryFn: getAccessState,
+  });
+
+  const hasAccess = Boolean(accessState?.hasGuideAccess);
+  const isLoggedIn = Boolean(accessState?.isLoggedIn);
+
+  const { mutate: startCheckout, isPending: isCheckoutPending } = useMutation({
+    mutationFn: createCheckoutSession,
+    onSuccess: (url) => {
+      window.location.href = url;
+    },
+  });
+
+  const handleUpgrade = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
+    startCheckout();
+  };
+
+  const issues = data?.issues ?? [];
+
+  const filtered = useMemo(() => {
+    return issues.filter((issue) => {
+      if (!issue.published) return false;
+      if (category !== "All Categories" && issue.category !== category) return false;
+      if (severity !== "all" && issue.severity !== severity) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return (
+          issue.title.toLowerCase().includes(q) ||
+          issue.body.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [issues, search, category, severity]);
+
+  return (
+    <Layout>
+      {/* Hero */}
+      <section className="bg-nav">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-green">
+            Micro Guides
+          </p>
+          <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">
+            Common Design Issues
+          </h1>
+          <p className="mt-3 max-w-2xl text-base text-nav-foreground/70">
+            A searchable collection of the most frequent design mistakes — with
+            clear explanations and actionable fixes.
+          </p>
+
+          {/* Severity legend */}
+          <div className="mt-6 flex flex-wrap gap-4">
+            <div className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-severity-minor" />
+              <span className="text-sm text-nav-foreground/60">Minor — cosmetic polish</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-severity-moderate" />
+              <span className="text-sm text-nav-foreground/60">Moderate — affects usability</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-severity-major" />
+              <span className="text-sm text-nav-foreground/60">Major — breaks experience</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Filters */}
+      <section className="border-b bg-card">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search issues..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+
+          {/* Category pills */}
+          <div className="mb-3 flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => (
+              <Button
+                key={cat}
+                variant={category === cat ? "default" : "outline"}
+                size="sm"
+                className="h-8 rounded-full text-xs"
+                onClick={() => setCategory(cat)}
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+
+          {/* Severity pills */}
+          <div className="flex flex-wrap gap-2">
+            {SEVERITY_FILTERS.map((s) => (
+              <Button
+                key={s.value}
+                variant={severity === s.value ? "default" : "outline"}
+                size="sm"
+                className="h-8 rounded-full text-xs"
+                onClick={() => setSeverity(s.value)}
+              >
+                {s.value !== "all" && (
+                  <span
+                    className={cn(
+                      "mr-1 inline-block h-2 w-2 rounded-full",
+                      s.value === "minor" && "bg-severity-minor",
+                      s.value === "moderate" && "bg-severity-moderate",
+                      s.value === "major" && "bg-severity-major"
+                    )}
+                  />
+                )}
+                {s.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Card grid */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {data?.source !== "design_issues" && (
+          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Connected in fallback mode ({data?.source ?? "mock"}). We'll use your
+            dedicated design issues table as soon as it is available.
+          </div>
+        )}
+
+        {isLoading && (
+          <div className="py-16 text-center">
+            <p className="text-muted-foreground">Loading design issues...</p>
+          </div>
+        )}
+
+        {isError && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+            We couldn't load live data right now. Showing fallback data so you can keep working.
+          </div>
+        )}
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((issue, index) => (
+            <MistakeCard
+              key={issue.id}
+              issue={issue}
+              blurred={!hasAccess && index >= FREE_CARD_LIMIT}
+              onSelect={setSelected}
+            />
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <div className="py-16 text-center">
+            <p className="text-muted-foreground">No issues match your filters.</p>
+          </div>
+        )}
+
+        {/* Paywall CTA */}
+        {!hasAccess && filtered.length > FREE_CARD_LIMIT && (
+          <div className="relative mt-8 overflow-hidden rounded-xl border border-border/80 bg-card p-8 text-center shadow-[0_4px_12px_rgba(12,34,43,0.11),0_12px_28px_rgba(12,34,43,0.09)]">
+            <div className="pointer-events-none absolute -right-20 -top-16 h-64 w-64 rounded-full bg-brand-green/10 blur-2xl" />
+            <span className="material-symbols-rounded mb-3 inline-flex text-3xl text-brand-green">lock</span>
+            <h2 className="font-display text-xl font-bold text-foreground">
+              Unlock All Design Issues
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              You’re previewing {Math.min(FREE_CARD_LIMIT, filtered.length)} of {issues.length} issues. Unlock full searchable access and all “How to Fix” solutions.
+            </p>
+            <Button size="lg" className="mt-4 w-full max-w-sm" onClick={handleUpgrade} disabled={isCheckoutPending}>
+              Get Full Access — {guideAccessPriceLabel}
+            </Button>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Already have Design Check access? Sign in to unlock.
+            </p>
+          </div>
+        )}
+      </section>
+
+      <MistakeModal
+        issue={selected}
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        hasAccess={hasAccess}
+        onUpgrade={handleUpgrade}
+        isUpgrading={isCheckoutPending}
+      />
+    </Layout>
+  );
+}

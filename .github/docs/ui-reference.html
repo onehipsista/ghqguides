@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Common Design Issues — GetHipQuick</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<style>
+  :root {
+    --green:        #418b59;
+    --green-dark:   #0c222b;
+    --green-light:  #eaf3ee;
+    --green-mid:    #c4d9cc;
+    --yellow:       #d4900a;
+    --red:          #c03535;
+    --ink:          #0c222b;
+    --ink-mid:      #3d5a4a;
+    --ink-light:    #7a9585;
+    --cream:        #f5f8f6;
+    --white:        #ffffff;
+    --border:       #dde8e2;
+
+    --radius-pill:  7px;
+    --radius-card:  10px;
+    --radius-input: 7px;
+    --radius-modal: 18px;
+
+    --shadow-card:  0 1px 3px rgba(12,34,43,0.07), 0 4px 14px rgba(12,34,43,0.05);
+    --shadow-hover: 0 4px 12px rgba(12,34,43,0.11), 0 12px 28px rgba(12,34,43,0.09);
+
+    --font: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 clamp(16px, 4vw, 32px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: clamp(52px, 7vw, 60px);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .logo-text {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    font-weight: 800;
+    color: var(--green-dark);
+    letter-spacing: -0.03em;
+  }
+
+  .logo-text span { color: var(--green); }
+
+  .logo-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+  }
+
+  .logo-sub {
+    font-size: clamp(0.68rem, 1.5vw, 0.75rem);
+    font-weight: 600;
+    color: var(--ink-light);
+    letter-spacing: 0.03em;
+  }
+
+  .btn-signin {
+    font-family: var(--font);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-mid);
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .btn-signin .material-icons-round { font-size: 15px; }
+  .btn-signin:hover { border-color: var(--green); color: var(--green); }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--green-dark);
+    color: var(--white);
+    padding: clamp(32px, 6vw, 56px) clamp(16px, 4vw, 32px) clamp(28px, 5vw, 48px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -100px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(65,139,89,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: clamp(0.65rem, 1.5vw, 0.7rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7ecba0;
+    margin-bottom: clamp(10px, 2vw, 14px);
+  }
+
+  .hero-eyebrow .material-icons-round { font-size: 14px; }
+
+  .hero h1 {
+    font-size: clamp(1.9rem, 6vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: clamp(10px, 2vw, 14px);
+  }
+
+  .hero h1 .accent { color: #7ecba0; }
+
+  .hero p {
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    font-weight: 400;
+    color: rgba(255,255,255,0.65);
+    max-width: 480px;
+    line-height: 1.65;
+    margin-bottom: clamp(20px, 4vw, 28px);
+  }
+
+  /* ── SEVERITY EXPLAINER ── */
+  .severity-explainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.11);
+    border-radius: var(--radius-card);
+    padding: clamp(14px, 3vw, 18px) clamp(16px, 3vw, 22px);
+    max-width: 520px;
+  }
+
+  .sev-explainer-title {
+    font-size: clamp(0.65rem, 1.3vw, 0.7rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 4px;
+  }
+
+  .sev-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .sev-dot-wrap {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 80px;
+    padding-top: 2px;
+  }
+
+  .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-minor    { background: #7ecba0; }
+  .dot-moderate { background: #f0ad3a; }
+  .dot-major    { background: #e05555; }
+
+  .sev-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .sev-label.minor    { color: #7ecba0; }
+  .sev-label.moderate { color: #f0ad3a; }
+  .sev-label.major    { color: #e05555; }
+
+  .sev-desc {
+    font-size: clamp(0.75rem, 1.5vw, 0.8rem);
+    font-weight: 400;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: clamp(12px, 2vw, 16px) clamp(16px, 4vw, 32px);
+    position: sticky;
+    top: clamp(52px, 7vw, 60px);
+    z-index: 90;
+  }
+
+  .controls-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .search-wrap { position: relative; }
+
+  .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--ink-light);
+    pointer-events: none;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: clamp(9px, 1.5vw, 11px) 12px clamp(9px, 1.5vw, 11px) 38px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-input);
+    font-family: var(--font);
+    font-size: clamp(0.85rem, 2vw, 0.9rem);
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(65,139,89,0.1);
+  }
+
+  input[type="text"]::placeholder { color: var(--ink-light); font-weight: 400; }
+
+  .filter-row {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .filter-row::-webkit-scrollbar { display: none; }
+
+  .pill {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: clamp(5px, 1vw, 7px) clamp(10px, 2vw, 13px);
+    border-radius: var(--radius-pill);
+    font-family: var(--font);
+    font-size: clamp(0.72rem, 1.5vw, 0.77rem);
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--ink-mid);
+    transition: all 0.14s;
+    white-space: nowrap;
+  }
+
+  .pill:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .pill.active { background: var(--green-dark); border-color: var(--green-dark); color: var(--white); }
+  .pill.sev-minor.active    { background: #2d7a4f; border-color: #2d7a4f; }
+  .pill.sev-moderate.active { background: #9a6000; border-color: #9a6000; }
+  .pill.sev-major.active    { background: var(--red); border-color: var(--red); }
+
+  /* ── GRID WRAP ── */
+  .grid-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: clamp(24px, 4vw, 36px) clamp(16px, 4vw, 32px) 72px;
+  }
+
+  .results-count {
+    font-size: clamp(0.75rem, 1.5vw, 0.82rem);
+    color: var(--ink-light);
+    font-weight: 500;
+    margin-bottom: clamp(16px, 3vw, 22px);
+  }
+
+  /* ── CATEGORY SECTION ── */
+  .cat-section {
+    margin-bottom: clamp(28px, 5vw, 40px);
+  }
+
+  .cat-section-header {
+    margin-bottom: clamp(12px, 2.5vw, 16px);
+    padding-bottom: clamp(10px, 2vw, 14px);
+    border-bottom: 2px solid var(--green-light);
+  }
+
+  .cat-section-title {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cat-section-title .material-icons-round {
+    font-size: 18px;
+    color: var(--green);
+  }
+
+  .cat-section-desc {
+    font-size: clamp(0.78rem, 1.6vw, 0.84rem);
+    font-weight: 400;
+    color: var(--ink-light);
+    line-height: 1.55;
+    max-width: 560px;
+  }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(10px, 2vw, 13px);
+  }
+
+  @media (min-width: 560px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 840px) {
+    .grid { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    padding: clamp(14px, 2.5vw, 19px);
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    border: 1.5px solid transparent;
+    animation: fadeUp 0.28s ease both;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--green-mid);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: clamp(7px, 1.5vw, 10px);
+  }
+
+  /* category label on card: text only, no icon */
+  .card-cat-label {
+    font-size: clamp(0.6rem, 1.2vw, 0.65rem);
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+
+  .card-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .card h3 {
+    font-size: clamp(0.88rem, 2vw, 0.96rem);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: clamp(6px, 1.5vw, 9px);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .card p {
+    font-size: clamp(0.78rem, 1.6vw, 0.84rem);
+    font-weight: 400;
+    color: var(--ink-mid);
+    line-height: 1.65;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    margin-top: clamp(10px, 2vw, 13px);
+    padding-top: clamp(10px, 2vw, 12px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .severity-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 3px 7px;
+    border-radius: 4px;
+  }
+
+  .severity-badge.minor    { color: #2d7a4f; background: #e5f4ec; }
+  .severity-badge.moderate { color: #8a5200; background: #fdf0d8; }
+  .severity-badge.major    { color: #9e1f1f; background: #fde8e8; }
+
+  .expand-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: clamp(0.68rem, 1.3vw, 0.73rem);
+    font-weight: 500;
+    color: var(--ink-light);
+  }
+
+  .expand-hint .material-icons-round { font-size: 13px; }
+
+  /* ── LOCKED / PAYWALL ── */
+  .card.locked {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.5;
+  }
+
+  .paywall-section {
+    position: relative;
+    margin-top: -80px;
+  }
+
+  .paywall-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, var(--cream) 36%);
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 20px;
+  }
+
+  .paywall-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: clamp(22px, 4vw, 30px) clamp(20px, 4vw, 28px);
+    text-align: center;
+    box-shadow: var(--shadow-hover);
+    max-width: 360px;
+    width: calc(100% - 32px);
+  }
+
+  .paywall-icon {
+    font-size: 30px;
+    color: var(--green);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .paywall-card h3 {
+    font-size: clamp(1.05rem, 3vw, 1.25rem);
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 7px;
+    letter-spacing: -0.02em;
+  }
+
+  .paywall-card p {
+    font-size: clamp(0.78rem, 1.8vw, 0.86rem);
+    font-weight: 400;
+    color: var(--ink-mid);
+    margin-bottom: clamp(16px, 3vw, 20px);
+    line-height: 1.55;
+  }
+
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--green-dark);
+    color: var(--white);
+    font-family: var(--font);
+    font-size: clamp(0.78rem, 1.8vw, 0.84rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: clamp(11px, 2vw, 13px) 24px;
+    border-radius: var(--radius-pill);
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.15s;
+    margin-bottom: 10px;
+  }
+
+  .btn-primary:hover { background: var(--green); }
+  .btn-primary .material-icons-round { font-size: 16px; }
+
+  .btn-secondary {
+    font-size: clamp(0.73rem, 1.5vw, 0.78rem);
+    font-weight: 500;
+    color: var(--ink-light);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font);
+    text-decoration: underline;
+    padding: 4px 0;
+  }
+
+  /* ── MODAL ── */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(12,34,43,0.55);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  @media (min-width: 640px) {
+    .modal-backdrop { align-items: center; }
+  }
+
+  .modal-backdrop.open {
+    display: flex;
+    animation: fadeIn 0.18s ease;
+  }
+
+  .modal {
+    background: var(--white);
+    border-radius: var(--radius-modal) var(--radius-modal) 0 0;
+    max-width: 560px;
+    width: 100%;
+    padding: clamp(20px, 4vw, 30px) clamp(20px, 4vw, 28px) clamp(28px, 5vw, 40px);
+    animation: slideUp 0.22s ease;
+    max-height: 82vh;
+    overflow-y: auto;
+  }
+
+  @media (min-width: 640px) {
+    .modal { border-radius: var(--radius-modal); max-height: 76vh; }
+  }
+
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto clamp(16px, 3vw, 22px);
+  }
+
+  .modal-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .modal-cat {
+    font-size: clamp(0.63rem, 1.3vw, 0.68rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+
+  .modal h2 {
+    font-size: clamp(1.2rem, 3.5vw, 1.45rem);
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: clamp(12px, 2.5vw, 16px);
+  }
+
+  .modal-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: clamp(14px, 3vw, 20px);
+    padding-bottom: clamp(14px, 3vw, 18px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-body {
+    font-size: clamp(0.88rem, 2vw, 0.94rem);
+    font-weight: 400;
+    color: var(--ink-mid);
+    line-height: 1.75;
+  }
+
+  .modal-close {
+    flex-shrink: 0;
+    background: var(--green-light);
+    border: none;
+    border-radius: 6px;
+    width: 32px; height: 32px;
+    cursor: pointer;
+    color: var(--green-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .modal-close:hover { background: var(--green-mid); }
+  .modal-close .material-icons-round { font-size: 16px; }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: clamp(40px, 8vw, 64px) 20px;
+    color: var(--ink-light);
+  }
+
+  .empty .material-icons-round { font-size: 34px; margin-bottom: 10px; display: block; opacity: 0.35; }
+  .empty p { font-size: clamp(0.84rem, 2vw, 0.9rem); font-weight: 400; line-height: 1.6; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { transform: translateY(24px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-text">GetHip<span>Quick</span></div>
+      <div class="logo-divider"></div>
+      <div class="logo-sub">Guide Library</div>
+    </div>
+    <button class="btn-signin">
+      <span class="material-icons-round">person_outline</span>
+      Sign In
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="material-icons-round">auto_fix_high</span>
+      GetHipQuick Series
+    </div>
+    <h1>Common<br><span class="accent">Design Issues</span></h1>
+    <p>The details that separate polished from amateur. Browse, search, and learn — so you stop making the same mistakes.</p>
+
+    <div class="severity-explainer">
+      <div class="sev-explainer-title">Issue Severity Guide</div>
+      <div class="sev-row">
+        <div class="sev-dot-wrap">
+          <span class="dot dot-minor"></span>
+          <span class="sev-label minor">Minor</span>
+        </div>
+        <div class="sev-desc">Nobody's calling the design police — but it's worth fixing when you have a moment.</div>
+      </div>
+      <div class="sev-row">
+        <div class="sev-dot-wrap">
+          <span class="dot dot-moderate"></span>
+          <span class="sev-label moderate">Moderate</span>
+        </div>
+        <div class="sev-desc">This one's noticeable. It won't ruin everything, but it will make people squint.</div>
+      </div>
+      <div class="sev-row">
+        <div class="sev-dot-wrap">
+          <span class="dot dot-major"></span>
+          <span class="sev-label major">Major</span>
+        </div>
+        <div class="sev-desc">Stop. Don't publish this yet. Fix it now before your audience does the judging for you.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <span class="material-icons-round search-icon">search</span>
+      <input type="text" id="search" placeholder="Search issues…" oninput="renderCards()">
+    </div>
+    <div class="filter-row" id="catFilters">
+      <button class="pill active" onclick="setCat('all',this)">All Topics</button>
+      <button class="pill" onclick="setCat('Typography',this)">Typography</button>
+      <button class="pill" onclick="setCat('Color',this)">Color</button>
+      <button class="pill" onclick="setCat('Spacing',this)">Spacing</button>
+      <button class="pill" onclick="setCat('Alignment',this)">Alignment</button>
+      <button class="pill" onclick="setCat('Imagery',this)">Imagery</button>
+      <button class="pill" onclick="setCat('Icons',this)">Icons</button>
+      <button class="pill" onclick="setCat('Effects',this)">Effects</button>
+      <button class="pill" onclick="setCat('Hierarchy',this)">Hierarchy</button>
+      <button class="pill" onclick="setCat('General',this)">General</button>
+    </div>
+    <div class="filter-row" id="sevFilters">
+      <button class="pill active"         onclick="setSev('all',this)">All Severity</button>
+      <button class="pill sev-minor"      onclick="setSev('minor',this)">Minor</button>
+      <button class="pill sev-moderate"   onclick="setSev('moderate',this)">Moderate</button>
+      <button class="pill sev-major"      onclick="setSev('major',this)">Major</button>
+    </div>
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="grid-wrap">
+  <div class="results-count" id="resultsCount"></div>
+  <div id="mainContent"></div>
+
+  <!-- PAYWALL -->
+  <div class="paywall-section" id="paywallSection" style="display:none">
+    <div class="grid" id="lockedGrid"></div>
+    <div class="paywall-overlay">
+      <div class="paywall-card">
+        <span class="material-icons-round paywall-icon">lock</span>
+        <h3>Unlock All Issues</h3>
+        <p>You're previewing 8 of <span id="totalCount">26</span> issues. One-time access — searchable, filterable, always updated.</p>
+        <button class="btn-primary" id="unlockBtn">
+          <span class="material-icons-round">bolt</span>
+          Get Full Access — $4.99
+        </button>
+        <button class="btn-secondary">Already have Design Check access? Sign in</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty" id="emptyState" style="display:none">
+    <span class="material-icons-round">search_off</span>
+    <p>No issues match your filters.<br>Try a different search or category.</p>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal" onclick="closeModalBackdrop(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-top">
+      <div>
+        <div class="modal-cat" id="modalCat"></div>
+        <h2 id="modalTitle"></h2>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+    <div class="modal-meta">
+      <span class="dot" id="modalDot"></span>
+      <span class="severity-badge" id="modalSeverity"></span>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const FREE_LIMIT = 8;
+let activeCat = 'all';
+let activeSev = 'all';
+let isUnlocked = false;
+
+// Category metadata: heading + short cheeky description
+const catMeta = {
+  Typography: {
+    icon: 'title',
+    desc: 'Fonts can make or break a design. These are the type choices that quietly signal "I just discovered Canva."'
+  },
+  Color: {
+    icon: 'palette',
+    desc: 'Color is one of the first things people feel before they can explain why. Here\'s what goes wrong.'
+  },
+  Spacing: {
+    icon: 'space_bar',
+    desc: 'Cramped or inconsistent spacing is one of the fastest ways to date a design. Give things room to breathe.'
+  },
+  Alignment: {
+    icon: 'align_horizontal_left',
+    desc: 'When elements aren\'t aligned, the eye notices — even if the brain can\'t explain why. Precision matters.'
+  },
+  Imagery: {
+    icon: 'image',
+    desc: 'Blurry, stretched, or stylistically mismatched images are a tell. Use photos that work with your design, not against it.'
+  },
+  Icons: {
+    icon: 'interests',
+    desc: 'Icons are a visual language. Mixing dialects makes the whole thing hard to read.'
+  },
+  Effects: {
+    icon: 'auto_awesome',
+    desc: 'Shadows, glows, and gradients: powerful in the right hands, chaotic in the wrong ones.'
+  },
+  Hierarchy: {
+    icon: 'account_tree',
+    desc: 'If everything is big, nothing is. Visual hierarchy tells viewers where to look first.'
+  },
+  General: {
+    icon: 'dashboard_customize',
+    desc: 'Style cohesion, visual consistency, and the overall feel. The stuff that\'s hard to name but easy to spot.'
+  }
+};
+
+const issues = [
+  { id:1,  title:"Decorative Type in All Caps",  category:"Typography", severity:"major",
+    body:"A decorative typeface in all caps often creates visual noise. Fonts with swashes, curls, or connected strokes are designed to flow — all caps interrupts that. Try capitalizing only the first letter so the decorative details can do their job." },
+  { id:2,  title:"Spacing Script Fonts",          category:"Typography", severity:"major",
+    body:"Script fonts have natural connections between letters that letter-spacing disrupts. Adding letter-spacing to a script typeface breaks the flow and makes words harder to read. If space is needed, adjust word spacing instead — or choose a different typeface for that element." },
+  { id:3,  title:"Misused Script Fonts",          category:"Typography", severity:"moderate",
+    body:"Script fonts are accent fonts. They work in small doses for headlines, names, or decorative callouts — not for body copy or long runs of text. Reserve them for a single statement element and pair with something clean and readable." },
+  { id:4,  title:"Too Many Fonts",                category:"Typography", severity:"moderate",
+    body:"More than two typefaces in a design usually signals a missing visual system. Pick a primary font for body copy and a secondary font for headings or accents. The combination should feel intentional, not assembled." },
+  { id:5,  title:"Centered Text Overuse",         category:"Typography", severity:"moderate",
+    body:"Centered text is great for short headlines or pull quotes. For longer paragraphs, the ragged starting edge of each line makes text harder to scan. Left-aligned body copy almost always reads better." },
+  { id:6,  title:"Random Bullet Points",          category:"Typography", severity:"minor",
+    body:"Bullets are for lists with two or more parallel items. A single bulleted point doesn't need the formatting — it just adds visual weight without purpose. Integrate it into the surrounding copy instead." },
+  { id:7,  title:"Gradient Harmony",              category:"Color",      severity:"minor",
+    body:"Gradients work best between colors with a natural relationship — same family, analogous hues, or monochromatic shades. Mixing unrelated colors risks banding or a muddy transition. When in doubt, go subtler." },
+  { id:8,  title:"Color Inconsistency",           category:"Color",      severity:"moderate",
+    body:"The design is pulling from colors that don't appear to be part of a defined palette. Canva tracks your colors in the palette panel — use it to ensure every value is intentional and repeatable across the design." },
+  { id:9,  title:"Too Many Colors",               category:"Color",      severity:"moderate",
+    body:"A tight palette used well beats a wide palette used randomly every time. Stick to a primary, secondary, and one accent. More than that and the design starts working against itself." },
+  { id:10, title:"Random Color Usage",            category:"Color",      severity:"moderate",
+    body:"Colors appear without a defined role or palette source. Every color in a design should be tied to a purpose — brand, hierarchy, or function. Arbitrary choices undermine trust, even when viewers can't pinpoint why." },
+  { id:11, title:"Text Too Close to Edge",        category:"Spacing",    severity:"moderate",
+    body:"Text placed inside a shape that sits right at — or outside — the edge creates a cramped, unfinished look. Center the text both horizontally and vertically, and leave consistent padding from every edge." },
+  { id:12, title:"Elements Too Close Together",   category:"Spacing",    severity:"moderate",
+    body:"Without enough breathing room between elements, a layout starts to feel dense and hard to navigate. White space isn't wasted — it helps the eye move naturally and gives each element room to register." },
+  { id:13, title:"Uneven Spacing",                category:"Spacing",    severity:"moderate",
+    body:"Some gaps feel tight, others loose — without a clear reason. Using a consistent spacing unit (multiples of 4 or 8px) gives the layout an underlying rhythm, even when spacing isn't perfectly identical throughout." },
+  { id:14, title:"Inconsistent Spacing",          category:"Spacing",    severity:"minor",
+    body:"Similar elements have different amounts of space around them, which makes the layout feel unplanned. Consistent spacing is one of the quickest ways to make a design feel more polished." },
+  { id:15, title:"Floating Elements",             category:"Alignment",  severity:"major",
+    body:"Elements that have no clear alignment relationship to anything else on the page look accidental. Everything should anchor to something — a grid, another element, or an implied edge." },
+  { id:16, title:"Near-Alignment",                category:"Alignment",  severity:"moderate",
+    body:"Elements that are almost — but not quite — aligned are often more distracting than an obvious misalignment. Near-alignment reads as a mistake. Use the alignment panel to snap to a shared edge or center axis." },
+  { id:17, title:"Mixed Photo Styles",            category:"Imagery",    severity:"moderate",
+    body:"Combining photos with different treatments — bright and saturated next to muted and desaturated — makes a design feel like it was assembled from different projects. A consistent filter, color grade, or crop style pulls them together." },
+  { id:18, title:"Low Resolution Image",          category:"Imagery",    severity:"major",
+    body:"Blurry or pixelated images read as unprofessional immediately. For print, aim for at least 300 DPI at output size. For digital, use images at least 2x the display size to account for retina screens." },
+  { id:19, title:"Stretched or Distorted Images", category:"Imagery",    severity:"major",
+    body:"Images that have been resized without maintaining aspect ratio look off before anyone can explain why. Always lock proportions when resizing, and replace any low-quality assets before publishing." },
+  { id:20, title:"Text Over Busy Backgrounds",    category:"Imagery",    severity:"moderate",
+    body:"Text on a complex image or pattern competes for attention and loses. A semi-transparent overlay, color block, or background blur behind the text creates the contrast needed to make it legible." },
+  { id:21, title:"Icon Size Inconsistency",       category:"Icons",      severity:"minor",
+    body:"Icons at random sizes throughout a design look unplanned. Set a standard size and stick to it — or use intentional, hierarchy-driven differences. Accidental variation stands out." },
+  { id:22, title:"Mixed Icon Styles",             category:"Icons",      severity:"moderate",
+    body:"Icons from different families — outlined, filled, rounded, geometric — create visual noise. Choose one style and use it consistently throughout, with matching size and color treatment." },
+  { id:23, title:"Drop Shadow Misuse",            category:"Effects",    severity:"moderate",
+    body:"Shadows indicate a light source and create depth — but they only work when they follow consistent logic. Shadows in different directions or with mismatched intensity create an effect that reads as physically impossible. Keep them subtle and consistent." },
+  { id:24, title:"Everything Is the Same Size",   category:"Hierarchy",  severity:"major",
+    body:"When all text elements are the same size, the eye doesn't know where to start. Hierarchy gives readers a path — what to look at first, second, third. Establish at least 2–3 clear size distinctions between headlines, subheads, and body copy." },
+  { id:25, title:"Mixed Visual Styles",           category:"General",    severity:"moderate",
+    body:"Flat icons next to realistic photography, or modern type paired with vintage ornaments — mixed styles can work, but they need to be very deliberate. If it feels accidental, it probably is. Simplify to one dominant visual direction." },
+  { id:26, title:"Style Inconsistency",           category:"General",    severity:"moderate",
+    body:"Illustrations, icons, photos, and decorative elements that come from different visual languages make a design feel assembled rather than designed. A shared line weight, color palette, or level of detail goes a long way toward cohesion." },
+];
+
+function dotColor(sev) {
+  return sev === 'minor' ? '#7ecba0' : sev === 'moderate' ? '#f0ad3a' : '#e05555';
+}
+
+function renderCards() {
+  const query = document.getElementById('search').value.toLowerCase().trim();
+
+  const filtered = issues.filter(i => {
+    const matchCat = activeCat === 'all' || i.category === activeCat;
+    const matchSev = activeSev === 'all' || i.severity === activeSev;
+    const matchQ   = !query || i.title.toLowerCase().includes(query) || i.body.toLowerCase().includes(query);
+    return matchCat && matchSev && matchQ;
+  });
+
+  document.getElementById('totalCount').textContent = issues.length;
+  const countEl    = document.getElementById('resultsCount');
+  const mainContent = document.getElementById('mainContent');
+  const lockedGrid = document.getElementById('lockedGrid');
+  const paywallSec = document.getElementById('paywallSection');
+  const emptyState = document.getElementById('emptyState');
+
+  mainContent.innerHTML = '';
+  lockedGrid.innerHTML  = '';
+
+  if (filtered.length === 0) {
+    emptyState.style.display = 'block';
+    paywallSec.style.display = 'none';
+    countEl.textContent = '';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  countEl.textContent = `${filtered.length} issue${filtered.length !== 1 ? 's' : ''}`;
+
+  const freeItems   = isUnlocked ? filtered : filtered.slice(0, FREE_LIMIT);
+  const lockedItems = isUnlocked ? [] : filtered.slice(FREE_LIMIT);
+
+  // Group free items by category (only when showing All Topics and no search)
+  const showGrouped = activeCat === 'all' && !query;
+
+  if (showGrouped) {
+    const grouped = {};
+    freeItems.forEach(issue => {
+      if (!grouped[issue.category]) grouped[issue.category] = [];
+      grouped[issue.category].push(issue);
+    });
+
+    let cardIndex = 0;
+    Object.keys(grouped).forEach(cat => {
+      const meta = catMeta[cat] || { icon: 'info', desc: '' };
+      const section = document.createElement('div');
+      section.className = 'cat-section';
+      section.innerHTML = `
+        <div class="cat-section-header">
+          <div class="cat-section-title">
+            <span class="material-icons-round">${meta.icon}</span>
+            ${cat}
+          </div>
+          <div class="cat-section-desc">${meta.desc}</div>
+        </div>
+        <div class="grid" id="grid-${cat}"></div>
+      `;
+      mainContent.appendChild(section);
+      const grid = section.querySelector(`#grid-${cat}`);
+      grouped[cat].forEach(issue => {
+        grid.appendChild(makeCard(issue, cardIndex++, false));
+      });
+    });
+  } else {
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    freeItems.forEach((issue, i) => grid.appendChild(makeCard(issue, i, false)));
+    mainContent.appendChild(grid);
+  }
+
+  if (lockedItems.length) {
+    paywallSec.style.display = 'block';
+    lockedItems.slice(0, 6).forEach((issue, i) => lockedGrid.appendChild(makeCard(issue, i, true)));
+  } else {
+    paywallSec.style.display = 'none';
+  }
+}
+
+function makeCard(issue, delay, locked) {
+  const card = document.createElement('div');
+  card.className = 'card' + (locked ? ' locked' : '');
+  card.style.animationDelay = `${delay * 35}ms`;
+  const capSev = issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1);
+
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-cat-label">${issue.category}</div>
+      <div class="card-dot" style="background:${dotColor(issue.severity)}"></div>
+    </div>
+    <h3>${issue.title}</h3>
+    <p>${issue.body}</p>
+    <div class="card-footer">
+      <span class="severity-badge ${issue.severity}">${capSev}</span>
+      <span class="expand-hint">Details <span class="material-icons-round">open_in_full</span></span>
+    </div>
+  `;
+
+  if (!locked) card.onclick = () => openModal(issue);
+  return card;
+}
+
+function openModal(issue) {
+  const capSev = issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1);
+  document.getElementById('modalCat').textContent   = issue.category;
+  document.getElementById('modalTitle').textContent = issue.title;
+  document.getElementById('modalBody').textContent  = issue.body;
+  document.getElementById('modalDot').style.background = dotColor(issue.severity);
+  const sevEl = document.getElementById('modalSeverity');
+  sevEl.textContent = capSev;
+  sevEl.className   = `severity-badge ${issue.severity}`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModalBackdrop(e) {
+  if (e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('open');
+  }
+}
+
+function setCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('#catFilters .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+
+function setSev(sev, btn) {
+  activeSev = sev;
+  document.querySelectorAll('#sevFilters .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+
+document.getElementById('unlockBtn').addEventListener('click', () => {
+  isUnlocked = true;
+  renderCards();
+});
+
+renderCards();
+</script>
+</body>
+</html>
