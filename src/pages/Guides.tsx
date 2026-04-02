@@ -107,19 +107,18 @@ export default function GuidesPage() {
                   </Link>
                 </h2>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-1 rounded-full border bg-background px-2 py-0.5">
-                    <span className="material-symbols-rounded text-sm">{guide.material_symbol ?? "menu_book"}</span>
+                  <span className="inline-flex items-center gap-1">
                     {guide.level ?? "All Levels"}
                   </span>
                   {guide.audience_market && (
-                    <span className="rounded-full border bg-background px-2 py-0.5">{guide.audience_market}</span>
+                    <span>{guide.audience_market}</span>
                   )}
                 </div>
-                <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{guide.description}</p>
+                <p className="mt-2 line-clamp-3 text-sm text-foreground/85">{guide.description}</p>
 
                 <Link
                   to={`/guides/${guide.slug}`}
-                  className="mt-4 inline-block text-sm font-medium text-brand-green hover:underline"
+                  className="mt-4 inline-flex rounded-md bg-brand-teal px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#10313d]"
                 >
                   Read Guide
                 </Link>

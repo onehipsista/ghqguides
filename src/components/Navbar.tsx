@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAccessState } from "@/lib/access";
 import { adminEmailAllowlist } from "@/lib/supabase";
@@ -46,16 +46,8 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-display text-lg font-bold text-brand-green">
-              GetHipQuick™
-            </span>
-            <span className="hidden text-sm text-nav-foreground/60 sm:inline">
-              |
-            </span>
-            <span className="hidden text-sm font-medium text-nav-foreground/80 sm:inline">
-              Guide Library
-            </span>
+          <Link to="/" className="flex items-center">
+            <img src="/ghq_logo_gw.svg" alt="GetHipQuick" className="h-9 w-auto" />
           </Link>
 
           {/* Desktop nav */}
@@ -78,25 +70,17 @@ export function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-nav-foreground/60 hover:text-brand-green hover:bg-white/5"
-            >
-              <Heart className="h-5 w-5" />
-            </Button>
-
             {isAuthenticated ? (
               <Button
                 variant="outline"
                 size="sm"
-                className="border-brand-green/30 bg-transparent text-brand-green hover:bg-brand-green hover:text-primary-foreground"
+                className="hidden border-brand-green/30 bg-transparent text-brand-green hover:bg-brand-green hover:text-primary-foreground md:inline-flex"
                 onClick={handleSignOut}
               >
                 Sign Out
               </Button>
             ) : (
-              <Link to="/login">
+              <Link to="/login" className="hidden md:inline-flex">
                 <Button
                   variant="outline"
                   size="sm"
@@ -139,6 +123,27 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+
+            {isAuthenticated ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  await handleSignOut();
+                  setMobileOpen(false);
+                }}
+                className="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-nav-foreground/70 transition-colors hover:bg-white/5 hover:text-nav-foreground"
+              >
+                Sign Out
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="block rounded-md px-3 py-2 text-base font-medium text-nav-foreground/70 transition-colors hover:bg-white/5 hover:text-nav-foreground"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       )}

@@ -22,6 +22,7 @@ export default {
         foreground: "hsl(var(--foreground))",
         nav: "hsl(var(--nav-bg))",
         "nav-foreground": "hsl(var(--nav-foreground))",
+        "brand-teal": "hsl(var(--brand-teal))",
         "brand-green": "hsl(var(--brand-green))",
         "brand-green-light": "hsl(var(--brand-green-light))",
         "severity-minor": "hsl(var(--severity-minor))",

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChevronDown, Clock3, Lock } from "lucide-react";
+import { ChevronDown, Clock3, Lock, Users } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Layout } from "@/components/Layout";
@@ -75,6 +75,11 @@ export default function GuideArticlePage() {
     setMobileTocOpen(false);
   }, [article?.id]);
 
+  useEffect(() => {
+    if (!article?.id) return;
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [article?.id]);
+
   const groupedToc = useMemo(() => {
     const sections = data?.sections ?? [];
     const articles = data?.articles ?? [];
@@ -105,10 +110,18 @@ export default function GuideArticlePage() {
 
   return (
     <Layout>
+      <section className="sticky top-16 z-40 border-b bg-background/95 backdrop-blur">
+        <div className="mx-auto max-w-4xl px-4 py-2 sm:px-6 lg:px-8">
+          <Link to="/guides" className="text-xs font-medium text-brand-green hover:underline">
+            ← Guide Library
+          </Link>
+        </div>
+      </section>
+
       <section className="border-b bg-card">
         <div className="mx-auto max-w-4xl px-4 py-5 sm:px-6 lg:px-8">
           <Breadcrumb>
-            <BreadcrumbList>
+            <BreadcrumbList className="text-xs">
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
                   <Link to="/guides">Guide Library</Link>
@@ -171,11 +184,14 @@ export default function GuideArticlePage() {
           <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
             <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
               <div className="rounded-lg border bg-card p-4 lg:max-h-[calc(100vh-7.5rem)] lg:overflow-y-auto">
-                <h2 className="font-display text-lg font-semibold">In This Guide</h2>
+                <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
+                  <span className="material-symbols-rounded text-base text-brand-green">chrome_reader_mode</span>
+                  In This Guide
+                </h2>
 
                 {groupedToc.unsectioned.length > 0 && (
                   <div className="mt-4">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quick Start</h3>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-[#134960]">Quick Start</h3>
                     <ul className="mt-2 space-y-1.5">
                       {groupedToc.unsectioned.map((tocArticle) => (
                         <li key={tocArticle.id} className="text-sm text-foreground/90">
@@ -198,7 +214,7 @@ export default function GuideArticlePage() {
                     const sectionArticles = groupedToc.articlesBySection.get(tocSection.id) ?? [];
                     return (
                       <div key={tocSection.id}>
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tocSection.title}</h3>
+                        <h3 className="text-xs font-semibold uppercase tracking-wide text-[#134960]">{tocSection.title}</h3>
                         <ul className="mt-2 space-y-1.5">
                           {sectionArticles.map((tocArticle) => (
                             <li key={tocArticle.id} className="pl-3 text-sm text-foreground/90">
@@ -228,7 +244,7 @@ export default function GuideArticlePage() {
                 className="flex w-full items-center justify-between px-4 py-3"
               >
                 <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <span className="material-symbols-rounded text-base text-brand-green">menu_book</span>
+                  <span className="material-symbols-rounded text-base text-brand-green">chrome_reader_mode</span>
                   In This Guide
                 </span>
                 <ChevronDown
@@ -241,7 +257,7 @@ export default function GuideArticlePage() {
                   {groupedToc.unsectioned.length > 0 && (
                     <div>
                       {groupedToc.sections.length > 0 && (
-                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#134960]">
                           Quick Start
                         </p>
                       )}
@@ -268,7 +284,7 @@ export default function GuideArticlePage() {
                     if (!sectionArticles.length) return null;
                     return (
                       <div key={tocSection.id}>
-                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#134960]">
                           {tocSection.title}
                         </p>
                         <ul className="space-y-0.5">
@@ -298,11 +314,40 @@ export default function GuideArticlePage() {
             </p>
             <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">{article.title}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1 rounded-full border bg-background px-2.5 py-1">
+              <span className="inline-flex items-center gap-1">
                 <Clock3 className="h-3.5 w-3.5" />
                 {article.reading_time_minutes ?? 1} min read
               </span>
-              {guide.level && <span className="rounded-full border bg-background px-2.5 py-1">{guide.level}</span>}
+              {guide.level && (
+                <span className="inline-flex items-center gap-1">
+                  <Users className="h-3.5 w-3.5" />
+                  {guide.level}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-5 flex items-center justify-between border-t border-b py-3">
+              {data?.prevArticle ? (
+                <Link
+                  to={`/guides/${guide.slug}/${data.prevArticle.slug}`}
+                  className="text-sm font-medium text-brand-green hover:underline"
+                >
+                  ← Previous
+                </Link>
+              ) : (
+                <span className="text-sm text-muted-foreground">← Previous</span>
+              )}
+
+              {data?.nextArticle ? (
+                <Link
+                  to={`/guides/${guide.slug}/${data.nextArticle.slug}`}
+                  className="text-sm font-medium text-brand-green hover:underline"
+                >
+                  Next: →
+                </Link>
+              ) : (
+                <span className="text-sm text-muted-foreground">Next: →</span>
+              )}
             </div>
 
             {!!article.synopsis && (
@@ -313,7 +358,7 @@ export default function GuideArticlePage() {
             )}
 
             {hasAccess ? (
-              <div className="mt-6 rounded-xl border bg-card p-6">
+              <div className="mt-6 rounded-md border bg-card p-6">
                 {looksLikeHtml(renderedContent) ? (
                   <div
                     className="guide-article-content whitespace-normal text-base leading-relaxed text-foreground"
@@ -326,7 +371,7 @@ export default function GuideArticlePage() {
                 )}
               </div>
             ) : (
-              <div className="relative mt-6 overflow-hidden rounded-xl border border-border/80 bg-card p-6 shadow-[0_10px_28px_-14px_rgba(12,34,43,0.35)]">
+              <div className="relative mt-6 overflow-hidden rounded-md border border-border/80 bg-card p-6 shadow-[0_10px_28px_-14px_rgba(12,34,43,0.35)]">
                 <div className="pointer-events-none select-none whitespace-pre-wrap text-base leading-relaxed text-foreground blur-[4px]">
                   {renderedContent || "Premium article content is available after unlock."}
                 </div>
@@ -360,7 +405,7 @@ export default function GuideArticlePage() {
                   to={`/guides/${guide.slug}/${data.nextArticle.slug}`}
                   className="text-sm font-medium text-brand-green hover:underline"
                 >
-                  {data.nextArticle.title} →
+                  Next: {data.nextArticle.title} →
                 </Link>
               ) : (
                 <span className="text-sm text-muted-foreground">End of guide</span>
@@ -375,7 +420,7 @@ export default function GuideArticlePage() {
                     <Link
                       key={relatedGuide.id}
                       to={`/guides/${relatedGuide.slug}`}
-                      className="rounded-lg bg-background p-3 transition-colors hover:bg-brand-green/5"
+                      className="rounded-[2px] border border-[#71ba6c] bg-transparent p-3 transition-colors hover:bg-brand-green/5"
                     >
                       <p className="text-xs text-muted-foreground">{relatedGuide.category ?? "General"}</p>
                       <p className="mt-1 text-sm font-semibold text-foreground">{relatedGuide.title}</p>

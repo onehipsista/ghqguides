@@ -38,7 +38,8 @@
     --radius: 0.45rem;
 
   /* Brand tokens */
- --nav-bg: 197 62% 10%;
+ --brand-teal: 196 62% 10%;
+ --nav-bg: 196 62% 10%;
  --nav-foreground: 210 20% 98%; /* Adjusted for high contrast text */
  --brand-green: 152 58% 37%;
  --brand-green-light: 146 43% 65%;

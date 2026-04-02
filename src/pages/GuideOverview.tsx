@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, ChevronDown } from "lucide-react";
+import { Clock3, ChevronDown } from "lucide-react";
 import { Layout } from "@/components/Layout";
 
 import {
@@ -69,10 +69,18 @@ export default function GuideOverviewPage() {
 
   return (
     <Layout>
+      <section className="sticky top-16 z-40 border-b bg-background/95 backdrop-blur">
+        <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
+          <Link to="/guides" className="text-xs font-medium text-brand-green hover:underline">
+            ← Guide Library
+          </Link>
+        </div>
+      </section>
+
       <section className="border-b bg-card">
         <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
           <Breadcrumb>
-            <BreadcrumbList>
+            <BreadcrumbList className="text-xs">
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
                   <Link to="/guides">Guide Library</Link>
@@ -110,12 +118,15 @@ export default function GuideOverviewPage() {
           <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
             <aside className="order-2 lg:order-1 lg:sticky lg:top-24 lg:self-start">
               <div className="rounded-lg border bg-card p-4 lg:max-h-[calc(100vh-7.5rem)] lg:overflow-y-auto">
-                <h2 className="font-display text-lg font-semibold">In This Guide</h2>
+                <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
+                  <span className="material-symbols-rounded text-base text-brand-green">chrome_reader_mode</span>
+                  In This Guide
+                </h2>
 
                 <div className="mt-4 hidden space-y-4 lg:block">
                   {grouped.unsectioned.length > 0 && (
                     <div>
-                      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      <h3 className="text-xs font-semibold uppercase tracking-wide text-[#134960]">
                         Quick Start
                       </h3>
                       <ul className="mt-2 space-y-1.5">
@@ -138,7 +149,7 @@ export default function GuideOverviewPage() {
 
                     return (
                       <div key={section.id}>
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        <h3 className="text-xs font-semibold uppercase tracking-wide text-[#134960]">
                           {section.title}
                         </h3>
                         <ul className="mt-2 space-y-1.5">
@@ -178,7 +189,7 @@ export default function GuideOverviewPage() {
                       {grouped.unsectioned.length > 0 && (
                         <div>
                           {(data?.sections?.length ?? 0) > 0 && (
-                            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#134960]">
                               Quick Start
                             </p>
                           )}
@@ -203,7 +214,7 @@ export default function GuideOverviewPage() {
                         if (!sectionArticles.length) return null;
                         return (
                           <div key={section.id}>
-                            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#134960]">
                               {section.title}
                             </p>
                             <ul className="space-y-0.5">
@@ -233,28 +244,23 @@ export default function GuideOverviewPage() {
                 {guide.category ?? "General"}
               </p>
               <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1 rounded-full border bg-background px-2.5 py-1">
-                  <span className="material-symbols-rounded text-sm">{guide.material_symbol ?? "menu_book"}</span>
-                  {guide.level ?? "All Levels"}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full border bg-background px-2.5 py-1">
-                  <BookOpen className="h-3.5 w-3.5" />
-                  {guide.audience_market ?? "General audience"}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full border bg-background px-2.5 py-1">
-                  <span className="material-symbols-rounded text-sm">schedule</span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock3 className="h-3.5 w-3.5" />
                   {totalReadingMinutes || 1} min read
                 </span>
               </div>
               <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">{guide.title}</h1>
-              <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground">
+              <p className="mt-4 max-w-3xl text-base leading-relaxed text-foreground/85">
                 {guide.description || "Guide overview coming soon."}
               </p>
 
-              {guide.cover_image && (
-                <div className="mt-6 overflow-hidden rounded-xl border">
-                  <img src={guide.cover_image} alt={guide.title} className="h-full w-full object-cover" />
-                </div>
+              {data?.articles?.[0] && (
+                <Link
+                  to={`/guides/${guide.slug}/${data.articles[0].slug}`}
+                  className="mt-5 inline-flex rounded-md bg-brand-teal px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#10313d]"
+                >
+                  Read Guide
+                </Link>
               )}
 
             </div>
