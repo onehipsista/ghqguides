@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getAccessState } from "@/lib/access";
+import { adminEmailAllowlist } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth";
@@ -17,7 +20,19 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { isAuthenticated } = useAuth();
-  const navLinks = import.meta.env.DEV
+  const { data: accessState } = useQuery({
+    queryKey: ["access-state"],
+    queryFn: getAccessState,
+    enabled: isAuthenticated,
+  });
+
+  const isAdminByRole = accessState?.role === "admin";
+  const isAdminByAllowlist = Boolean(
+    accessState?.email && adminEmailAllowlist.includes(accessState.email.toLowerCase())
+  );
+  const isAdmin = isAdminByRole || isAdminByAllowlist;
+
+  const navLinks = isAdmin
     ? [...baseNavLinks, { label: "Admin", href: "/admin" }]
     : baseNavLinks;
 
