@@ -11,6 +11,20 @@ This app runs on React + Vite + Tailwind and now supports live data from Supabas
 5. (Optional) Set `VITE_GUIDE_ACCESS_PRICE_LABEL` (default: `$5.99`).
 6. (Optional) Set `VITE_DEV_PORT` if you want a fixed local port.
 
+## 1b) Vercel environment variables
+
+For production deployments, `.env.local` is not uploaded to Vercel.
+
+Add these in Vercel → Project Settings → Environment Variables:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_STRIPE_PAYMENT_LINK`
+- `VITE_ADMIN_EMAILS` (optional)
+- `VITE_GUIDE_ACCESS_PRICE_LABEL` (optional)
+
+After saving them, redeploy the project.
+
 ## 2) Supabase kickoff SQL
 
 Run [supabase/phase1-ghq-guides.sql](supabase/phase1-ghq-guides.sql) in the Supabase SQL editor.

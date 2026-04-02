@@ -29,9 +29,10 @@ export default function LoginPage() {
               <CardTitle>Supabase is not configured</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local`.
-              </p>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>Add your <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>.</p>
+                <p>For local development, put them in <code>.env.local</code>. For Vercel, add them in Project Settings → Environment Variables and redeploy.</p>
+              </div>
             </CardContent>
           </Card>
         </section>
