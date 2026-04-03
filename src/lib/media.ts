@@ -2,6 +2,21 @@ import { supabase } from "@/lib/supabase";
 
 const GUIDE_MEDIA_BUCKET = "guide-media";
 
+export const getVersionedMediaUrl = (url: string | null | undefined, version?: string | null): string => {
+  if (!url) return "";
+
+  if (!version) return url;
+
+  try {
+    const nextUrl = new URL(url);
+    nextUrl.searchParams.set("v", version);
+    return nextUrl.toString();
+  } catch {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}v=${encodeURIComponent(version)}`;
+  }
+};
+
 export const uploadGuideCover = async (file: File): Promise<string> => {
   if (!supabase) {
     throw new Error("Supabase is not configured.");

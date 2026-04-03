@@ -343,10 +343,10 @@ export default function GuideArticlePage() {
                   to={`/guides/${guide.slug}/${data.nextArticle.slug}`}
                   className="text-sm font-medium text-brand-green hover:underline"
                 >
-                  Next: →
+                  Next →
                 </Link>
               ) : (
-                <span className="text-sm text-muted-foreground">Next: →</span>
+                <span className="text-sm text-muted-foreground">Next →</span>
               )}
             </div>
 

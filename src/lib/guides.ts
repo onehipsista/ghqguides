@@ -13,6 +13,7 @@ interface GuideRow {
   slug: string;
   description: string | null;
   cover_image: string | null;
+  order_index?: number | null;
   category: string | null;
   audience_market?: string | null;
   level?: string | null;
@@ -43,6 +44,8 @@ interface ArticleRow {
   updated_at: string | null;
 }
 
+const GUIDE_SELECT_V3 =
+  "id, title, slug, description, cover_image, order_index, category, audience_market, level, material_symbol, featured, published, updated_at";
 const GUIDE_SELECT_V2 =
   "id, title, slug, description, cover_image, category, audience_market, level, material_symbol, featured, published, updated_at";
 const GUIDE_SELECT_V1 = "id, title, slug, description, cover_image, category, featured, published, updated_at";
@@ -59,6 +62,7 @@ const toGuide = (row: GuideRow): Guide => ({
   slug: row.slug,
   description: row.description ?? "",
   cover_image: row.cover_image,
+  order_index: Number(row.order_index ?? 0),
   category: row.category,
   audience_market: row.audience_market ?? null,
   level: row.level ?? null,
@@ -100,8 +104,9 @@ export const getPublicGuides = async (): Promise<GuidesResult> => {
   const { data, error } = await supabase
     .schema("ghq_guides")
     .from("guides")
-    .select(GUIDE_SELECT_V2)
+    .select(GUIDE_SELECT_V3)
     .eq("published", true)
+    .order("order_index", { ascending: true })
     .order("featured", { ascending: false })
     .order("updated_at", { ascending: false, nullsFirst: false });
 
@@ -146,7 +151,7 @@ export const getGuideOverviewBySlug = async (slug: string): Promise<GuideOvervie
   const { data: guideData, error: guideError } = await supabase
     .schema("ghq_guides")
     .from("guides")
-    .select(GUIDE_SELECT_V2)
+    .select(GUIDE_SELECT_V3)
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle();
@@ -242,7 +247,7 @@ export const getGuideArticleBySlugs = async (
   const { data: guideData, error: guideError } = await supabase
     .schema("ghq_guides")
     .from("guides")
-    .select(GUIDE_SELECT_V2)
+    .select(GUIDE_SELECT_V3)
     .eq("slug", guideSlug)
     .eq("published", true)
     .maybeSingle();
@@ -299,7 +304,7 @@ export const getGuideArticleBySlugs = async (
     supabase
       .schema("ghq_guides")
       .from("guides")
-      .select(GUIDE_SELECT_V2)
+      .select(GUIDE_SELECT_V3)
       .eq("published", true)
       .eq("category", guide.category ?? "")
       .neq("id", guide.id)

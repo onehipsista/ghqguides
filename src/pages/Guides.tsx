@@ -1,33 +1,45 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Input } from "@/components/ui/input";
 import { getPublicGuides } from "@/lib/guides";
+import { getVersionedMediaUrl } from "@/lib/media";
 
 export default function GuidesPage() {
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["public-guides"],
     queryFn: getPublicGuides,
   });
 
+  const categories = useMemo(
+    () => Array.from(new Set((data?.guides ?? []).map((guide) => guide.category).filter(Boolean))).sort(),
+    [data?.guides]
+  );
+
   const filteredGuides = useMemo(() => {
     const guides = data?.guides ?? [];
 
-    if (!search.trim()) return guides;
+    const categoryFiltered = guides.filter((guide) => {
+      if (categoryFilter === "all") return true;
+      return (guide.category ?? "") === categoryFilter;
+    });
+
+    if (!search.trim()) return categoryFiltered;
 
     const q = search.toLowerCase();
 
-    return guides.filter(
+    return categoryFiltered.filter(
       (guide) =>
         guide.title.toLowerCase().includes(q) ||
         guide.description.toLowerCase().includes(q) ||
         (guide.category ?? "").toLowerCase().includes(q)
     );
-  }, [data?.guides, search]);
+  }, [categoryFilter, data?.guides, search]);
 
   return (
     <Layout>
@@ -43,14 +55,28 @@ export default function GuidesPage() {
             Practical mini-guides you can read fast and apply immediately.
           </p>
 
-          <div className="relative mt-6 max-w-xl">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-nav-foreground/50" />
-            <Input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search guides..."
-              className="border-white/20 bg-white/5 pl-9 text-white placeholder:text-nav-foreground/50"
-            />
+          <div className="mt-6 flex max-w-3xl flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-nav-foreground/50" />
+              <Input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search guides..."
+                className="border-white/20 bg-white/5 pl-9 text-white placeholder:text-nav-foreground/50"
+              />
+            </div>
+            <select
+              className="h-10 rounded-md border border-white/20 bg-white/5 px-3 text-sm text-white"
+              value={categoryFilter}
+              onChange={(event) => setCategoryFilter(event.target.value)}
+            >
+              <option value="all" className="text-foreground">All categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category ?? ""} className="text-foreground">
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </section>
@@ -78,7 +104,7 @@ export default function GuidesPage() {
               <Link to={`/guides/${guide.slug}`} className="block aspect-[16/9] w-full bg-muted">
                 {guide.cover_image ? (
                   <img
-                    src={guide.cover_image}
+                    src={getVersionedMediaUrl(guide.cover_image, guide.updated_at)}
                     alt={guide.title}
                     className="h-full w-full object-cover"
                     loading="lazy"
@@ -91,7 +117,7 @@ export default function GuidesPage() {
               </Link>
               <div className="p-4">
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-green">
                     {guide.category ?? "General"}
                   </span>
                   {guide.featured && (
@@ -101,20 +127,25 @@ export default function GuidesPage() {
                   )}
                 </div>
 
-                <h2 className="font-display text-lg font-semibold text-foreground">
+                <h2 className="font-display text-xl font-bold tracking-[-0.01em] text-foreground">
                   <Link to={`/guides/${guide.slug}`} className="hover:text-brand-green hover:underline">
                     {guide.title}
                   </Link>
                 </h2>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-1">
-                    {guide.level ?? "All Levels"}
-                  </span>
+                  <span>{guide.level ?? "All Levels"}</span>
                   {guide.audience_market && (
-                    <span>{guide.audience_market}</span>
+                    <>
+                      <span className="text-border">|</span>
+                      <span className="inline-flex items-center gap-1">
+                        <Users className="h-3.5 w-3.5" />
+                        {guide.audience_market}
+                      </span>
+                    </>
                   )}
                 </div>
-                <p className="mt-2 line-clamp-3 text-sm text-foreground/85">{guide.description}</p>
+                <div className="mt-3 border-t border-[#dde8e2]" />
+                <p className="mt-3 line-clamp-3 text-sm text-foreground/85">{guide.description}</p>
 
                 <Link
                   to={`/guides/${guide.slug}`}

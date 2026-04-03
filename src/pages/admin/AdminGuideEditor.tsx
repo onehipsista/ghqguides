@@ -18,7 +18,7 @@ import {
   saveAdminGuide,
 } from "@/lib/admin-guides";
 import { GUIDE_AUDIENCE_OPTIONS, GUIDE_CATEGORY_OPTIONS, GUIDE_LEVEL_OPTIONS } from "@/lib/guide-options";
-import { uploadGuideCover } from "@/lib/media";
+import { getVersionedMediaUrl, uploadGuideCover } from "@/lib/media";
 import { adminEmailAllowlist } from "@/lib/supabase";
 
 interface GuideFormState {
@@ -350,6 +350,15 @@ export default function AdminGuideEditorPage() {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">Upload uses the public <strong>guide-media</strong> bucket.</p>
+            {form.cover_image && (
+              <div className="overflow-hidden rounded-md border bg-muted">
+                <img
+                  src={getVersionedMediaUrl(form.cover_image, guideData?.updated_at ?? new Date().toISOString())}
+                  alt={form.title || "Guide cover preview"}
+                  className="aspect-[16/9] w-full object-cover"
+                />
+              </div>
+            )}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">

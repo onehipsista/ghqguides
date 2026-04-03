@@ -35,6 +35,7 @@ interface GuideRow {
   slug: string;
   description: string | null;
   cover_image: string | null;
+  order_index?: number | null;
   category: string | null;
   audience_market?: string | null;
   level?: string | null;
@@ -65,6 +66,8 @@ interface ArticleRow {
   updated_at: string | null;
 }
 
+const GUIDE_SELECT_V3 =
+  "id, title, slug, description, cover_image, order_index, category, audience_market, level, material_symbol, featured, published, updated_at";
 const GUIDE_SELECT_V2 =
   "id, title, slug, description, cover_image, category, audience_market, level, material_symbol, featured, published, updated_at";
 const GUIDE_SELECT_V1 = "id, title, slug, description, cover_image, category, featured, published, updated_at";
@@ -87,6 +90,7 @@ const toGuide = (row: GuideRow): Guide => ({
   slug: row.slug,
   description: row.description ?? "",
   cover_image: row.cover_image,
+  order_index: Number(row.order_index ?? 0),
   category: row.category,
   audience_market: row.audience_market ?? null,
   level: row.level ?? null,
@@ -126,7 +130,8 @@ export const getAdminGuides = async (): Promise<Guide[]> => {
   const { data, error } = await client
     .schema("ghq_guides")
     .from("guides")
-    .select(GUIDE_SELECT_V2)
+    .select(GUIDE_SELECT_V3)
+    .order("order_index", { ascending: true })
     .order("updated_at", { ascending: false, nullsFirst: false });
 
   if (!error && data) {
@@ -149,7 +154,7 @@ export const getAdminGuideById = async (id: string): Promise<Guide | null> => {
   const { data, error } = await client
     .schema("ghq_guides")
     .from("guides")
-    .select(GUIDE_SELECT_V2)
+    .select(GUIDE_SELECT_V3)
     .eq("id", id)
     .maybeSingle();
 
@@ -171,6 +176,19 @@ export const getAdminGuideById = async (id: string): Promise<Guide | null> => {
 export const saveAdminGuide = async (input: AdminGuideInput): Promise<void> => {
   const client = assertSupabase();
 
+  let nextOrderIndex: number | undefined;
+  if (!input.id) {
+    const { data: maxOrderRow } = await client
+      .schema("ghq_guides")
+      .from("guides")
+      .select("order_index")
+      .order("order_index", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    nextOrderIndex = Number((maxOrderRow as { order_index?: number | null } | null)?.order_index ?? 0) + 1;
+  }
+
   const payload = {
     title: input.title,
     slug: input.slug,
@@ -183,6 +201,11 @@ export const saveAdminGuide = async (input: AdminGuideInput): Promise<void> => {
     featured: input.featured,
     published: input.published,
     updated_at: new Date().toISOString(),
+  };
+
+  const createPayload = {
+    ...payload,
+    order_index: nextOrderIndex ?? 0,
   };
 
   if (input.id) {
@@ -215,7 +238,7 @@ export const saveAdminGuide = async (input: AdminGuideInput): Promise<void> => {
     return;
   }
 
-  const { error } = await client.schema("ghq_guides").from("guides").insert(payload);
+  const { error } = await client.schema("ghq_guides").from("guides").insert(createPayload);
   if (error) {
     const legacyPayload = {
       title: input.title,
@@ -230,6 +253,32 @@ export const saveAdminGuide = async (input: AdminGuideInput): Promise<void> => {
     const { error: fallbackError } = await client.schema("ghq_guides").from("guides").insert(legacyPayload);
     if (fallbackError) throw fallbackError;
   }
+};
+
+export const swapGuideOrder = async (sourceGuideId: string, targetGuideId: string): Promise<void> => {
+  const client = assertSupabase();
+  const guides = await getAdminGuides();
+
+  const source = guides.find((guide) => guide.id === sourceGuideId);
+  const target = guides.find((guide) => guide.id === targetGuideId);
+
+  if (!source || !target) return;
+
+  const timestamp = new Date().toISOString();
+
+  const { error: firstError } = await client
+    .schema("ghq_guides")
+    .from("guides")
+    .update({ order_index: target.order_index, updated_at: timestamp })
+    .eq("id", source.id);
+  if (firstError) throw firstError;
+
+  const { error: secondError } = await client
+    .schema("ghq_guides")
+    .from("guides")
+    .update({ order_index: source.order_index, updated_at: timestamp })
+    .eq("id", target.id);
+  if (secondError) throw secondError;
 };
 
 export const setGuidePublished = async (guideId: string, published: boolean): Promise<void> => {

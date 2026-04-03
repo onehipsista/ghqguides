@@ -37,6 +37,8 @@ For guide metadata enhancements (audience/level/synopsis/reading-time), run [sup
 
 For cover image uploads, run [supabase/phase5-media-bucket.sql](supabase/phase5-media-bucket.sql).
 
+For manual guide ordering in admin drag-and-drop, run [supabase/phase6-guide-ordering.sql](supabase/phase6-guide-ordering.sql).
+
 This creates:
 
 - schema: `ghq_guides`

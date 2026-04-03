@@ -1,13 +1,22 @@
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { getAccessState } from "@/lib/access";
-import { getAdminGuides, setGuideFeatured, setGuidePublished } from "@/lib/admin-guides";
+import { getAdminGuides, setGuideFeatured, setGuidePublished, swapGuideOrder } from "@/lib/admin-guides";
+import { getVersionedMediaUrl } from "@/lib/media";
 import { adminEmailAllowlist } from "@/lib/supabase";
+
+type SortOption = "updated" | "title" | "category";
+type ViewMode = "list" | "cards";
 
 export default function AdminGuidesPage() {
   const queryClient = useQueryClient();
+  const [sortBy, setSortBy] = useState<SortOption>("updated");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [draggedGuideId, setDraggedGuideId] = useState<string | null>(null);
 
   const { data: accessState, isLoading: isAccessLoading } = useQuery({
     queryKey: ["access-state"],
@@ -44,17 +53,98 @@ export default function AdminGuidesPage() {
     },
   });
 
+  const { mutate: reorderGuide, isPending: isReorderingGuide } = useMutation({
+    mutationFn: ({ sourceGuideId, targetGuideId }: { sourceGuideId: string; targetGuideId: string }) =>
+      swapGuideOrder(sourceGuideId, targetGuideId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-guides"] });
+      queryClient.invalidateQueries({ queryKey: ["public-guides"] });
+    },
+  });
+
+  const categories = useMemo(
+    () => Array.from(new Set(guides.map((guide) => guide.category).filter(Boolean))).sort(),
+    [guides]
+  );
+
+  const visibleGuides = useMemo(() => {
+    const filtered = guides.filter((guide) => {
+      if (categoryFilter === "all") return true;
+      return (guide.category ?? "") === categoryFilter;
+    });
+
+    if (viewMode === "cards") {
+      return filtered;
+    }
+
+    return [...filtered].sort((left, right) => {
+      if (sortBy === "title") {
+        return left.title.localeCompare(right.title);
+      }
+
+      if (sortBy === "category") {
+        return (left.category ?? "").localeCompare(right.category ?? "") || left.title.localeCompare(right.title);
+      }
+
+      return new Date(right.updated_at ?? 0).getTime() - new Date(left.updated_at ?? 0).getTime();
+    });
+  }, [categoryFilter, guides, sortBy, viewMode]);
+
   return (
     <Layout>
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <h1 className="font-display text-2xl font-bold text-foreground">Admin — Guides</h1>
         <p className="mt-2 text-sm text-muted-foreground">Create and manage guide metadata and visibility.</p>
 
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <Link to="/admin/guides/new">
             <Button>Add New Guide</Button>
           </Link>
+
+          <select
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value as SortOption)}
+          >
+            <option value="updated">Sort: Recently updated</option>
+            <option value="title">Sort: Title A–Z</option>
+            <option value="category">Sort: Category</option>
+          </select>
+
+          <select
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            value={categoryFilter}
+            onChange={(event) => setCategoryFilter(event.target.value)}
+          >
+            <option value="all">All categories</option>
+            {categories.map((category) => (
+              <option key={category} value={category ?? ""}>{category}</option>
+            ))}
+          </select>
+
+          <div className="inline-flex rounded-md border bg-background p-1">
+            <button
+              type="button"
+              onClick={() => setViewMode("list")}
+              className={`rounded px-3 py-1 text-sm ${viewMode === "list" ? "bg-brand-green text-white" : "text-foreground/70"}`}
+            >
+              List
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("cards")}
+              className={`rounded px-3 py-1 text-sm ${viewMode === "cards" ? "bg-brand-green text-white" : "text-foreground/70"}`}
+            >
+              Cards
+            </button>
+          </div>
         </div>
+
+        {viewMode === "cards" && (
+          <div className="mt-3 rounded-md border border-brand-green/20 bg-brand-green/5 px-3 py-2 text-sm text-foreground/80">
+            Drag cards onto each other to reorder guides manually. Run `phase6-guide-ordering.sql` first so the new order saves.
+          </div>
+        )}
 
         {isAccessLoading && (
           <div className="mt-6 rounded-lg border bg-card p-4 text-sm text-muted-foreground">Checking access...</div>
@@ -72,8 +162,81 @@ export default function AdminGuidesPage() {
               <div className="p-4 text-sm text-muted-foreground">Loading guides...</div>
             ) : isError ? (
               <div className="p-4 text-sm text-red-700">Could not load guides.</div>
-            ) : guides.length === 0 ? (
+            ) : visibleGuides.length === 0 ? (
               <div className="p-4 text-sm text-muted-foreground">No guides yet.</div>
+            ) : viewMode === "cards" ? (
+              <div className="grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-3">
+                {visibleGuides.map((guide) => (
+                  <article
+                    key={guide.id}
+                    draggable
+                    onDragStart={() => setDraggedGuideId(guide.id)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => {
+                      if (!draggedGuideId || draggedGuideId === guide.id) return;
+                      reorderGuide({ sourceGuideId: draggedGuideId, targetGuideId: guide.id });
+                      setDraggedGuideId(null);
+                    }}
+                    onDragEnd={() => setDraggedGuideId(null)}
+                    className={`overflow-hidden rounded-lg border bg-transparent transition-all ${draggedGuideId === guide.id ? "scale-[0.98] opacity-60" : ""}`}
+                  >
+                    <div className="aspect-[16/9] w-full bg-muted">
+                      {guide.cover_image ? (
+                        <img
+                          src={getVersionedMediaUrl(guide.cover_image, guide.updated_at)}
+                          alt={guide.title}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                          No cover image
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-brand-green">
+                          {guide.category ?? "General"}
+                        </p>
+                        <span className="cursor-grab text-xs text-muted-foreground">Drag</span>
+                      </div>
+                      <h2 className="mt-2 font-display text-lg font-bold text-foreground">
+                        <Link to={`/admin/guides/${guide.id}`} className="hover:text-brand-green hover:underline">
+                          {guide.title}
+                        </Link>
+                      </h2>
+                      <p className="mt-2 line-clamp-3 text-sm text-foreground/80">{guide.description}</p>
+                      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span>{guide.featured ? "Featured" : "Standard"}</span>
+                        <span>•</span>
+                        <span>{guide.published ? "Published" : "Draft"}</span>
+                      </div>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={isFeaturing || isReorderingGuide}
+                          onClick={() => toggleFeatured({ guideId: guide.id, featured: !guide.featured })}
+                        >
+                          {guide.featured ? "Unfeature" : "Feature"}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={guide.published ? "outline" : "default"}
+                          disabled={isPublishing || isReorderingGuide}
+                          onClick={() => togglePublished({ guideId: guide.id, published: !guide.published })}
+                        >
+                          {guide.published ? "Unpublish" : "Publish"}
+                        </Button>
+                        <Link to={`/admin/guides/${guide.id}`}>
+                          <Button size="sm" variant="outline">Edit</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
             ) : (
               <table className="min-w-full divide-y divide-border">
                 <thead className="bg-muted/40">
@@ -87,7 +250,7 @@ export default function AdminGuidesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {guides.map((guide) => (
+                  {visibleGuides.map((guide) => (
                     <tr key={guide.id}>
                       <td className="px-4 py-3 text-sm text-foreground">
                         <Link to={`/admin/guides/${guide.id}`} className="font-medium hover:text-brand-green hover:underline">
@@ -103,7 +266,7 @@ export default function AdminGuidesPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={isFeaturing}
+                            disabled={isFeaturing || isReorderingGuide}
                             onClick={() => toggleFeatured({ guideId: guide.id, featured: !guide.featured })}
                           >
                             {guide.featured ? "Unfeature" : "Feature"}
@@ -111,7 +274,7 @@ export default function AdminGuidesPage() {
                           <Button
                             size="sm"
                             variant={guide.published ? "outline" : "default"}
-                            disabled={isPublishing}
+                            disabled={isPublishing || isReorderingGuide}
                             onClick={() =>
                               togglePublished({ guideId: guide.id, published: !guide.published })
                             }
