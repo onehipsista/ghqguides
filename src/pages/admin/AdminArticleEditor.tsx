@@ -253,6 +253,17 @@ export default function AdminArticleEditorPage() {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="synopsis">Synopsis / TLDR</Label>
+            <Textarea
+              id="synopsis"
+              rows={3}
+              value={form.synopsis}
+              onChange={(event) => setForm((prev) => ({ ...prev, synopsis: event.target.value }))}
+              placeholder="A short summary shown at the top of the article."
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="content">Content</Label>
             <MarkdownLiteEditor
               value={form.content}
@@ -262,17 +273,6 @@ export default function AdminArticleEditorPage() {
                   content: nextValue,
                 }))
               }
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="synopsis">Synopsis / TLDR</Label>
-            <Textarea
-              id="synopsis"
-              rows={3}
-              value={form.synopsis}
-              onChange={(event) => setForm((prev) => ({ ...prev, synopsis: event.target.value }))}
-              placeholder="A short summary shown at the top of the article."
             />
           </div>
 
@@ -291,6 +291,27 @@ export default function AdminArticleEditorPage() {
               }
             />
           </div>
+
+          {isEditing && articleData && (
+            <div className="grid gap-4 rounded-md border border-border/60 bg-muted/30 px-4 py-3 text-sm sm:grid-cols-2">
+              <div>
+                <span className="font-medium text-muted-foreground">Created: </span>
+                <span className="text-foreground">
+                  {articleData.created_at
+                    ? new Date(articleData.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                    : "—"}
+                </span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Last Updated: </span>
+                <span className="text-foreground">
+                  {articleData.updated_at
+                    ? new Date(articleData.updated_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                    : "—"}
+                </span>
+              </div>
+            </div>
+          )}
 
           <label className="flex items-center gap-2 text-sm">
             <input

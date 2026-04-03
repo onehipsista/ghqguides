@@ -41,6 +41,7 @@ interface ArticleRow {
   reading_time_minutes?: number | null;
   order_index: number | null;
   published: boolean | null;
+  created_at?: string | null;
   updated_at: string | null;
 }
 
@@ -51,7 +52,7 @@ const GUIDE_SELECT_V2 =
 const GUIDE_SELECT_V1 = "id, title, slug, description, cover_image, category, featured, published, updated_at";
 
 const ARTICLE_SELECT_V2 =
-  "id, guide_id, section_id, title, slug, synopsis, content, reading_time_minutes, order_index, published, updated_at";
+  "id, guide_id, section_id, title, slug, synopsis, content, reading_time_minutes, order_index, published, created_at, updated_at";
 const ARTICLE_SELECT_V1 = "id, guide_id, section_id, title, slug, content, order_index, published, updated_at";
 
 const mockGuides: Guide[] = [];
@@ -93,6 +94,7 @@ const toArticle = (row: ArticleRow): GuideArticle => ({
       : estimateReadingTimeMinutes(String(row.content ?? "")),
   order_index: Number(row.order_index ?? 0),
   published: Boolean(row.published),
+  created_at: row.created_at ?? null,
   updated_at: row.updated_at,
 });
 

@@ -1,7 +1,6 @@
-import { Heart } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { SeverityBadge } from "@/components/SeverityBadge";
-import { Button } from "@/components/ui/button";
 import type { DesignIssue } from "@/types/design-issue";
 
 interface MistakeCardProps {
@@ -17,7 +16,7 @@ export function MistakeCard({ issue, blurred, onSelect }: MistakeCardProps) {
         <CardContent className="p-5">
           <div className="select-none blur-[4px] opacity-60">
             <div className="mb-3 flex items-center justify-between">
-              <SeverityBadge severity={issue.severity} />
+              <SeverityBadge severity={issue.severity} className="uppercase tracking-wide" />
               <span className="text-xs text-muted-foreground">{issue.category}</span>
             </div>
             <h3 className="mb-2 font-display text-base font-semibold text-foreground">
@@ -42,19 +41,12 @@ export function MistakeCard({ issue, blurred, onSelect }: MistakeCardProps) {
     >
       <CardContent className="p-5">
         <div className="mb-3 flex items-center justify-between">
-          <SeverityBadge severity={issue.severity} />
+          <SeverityBadge severity={issue.severity} className="uppercase tracking-wide" />
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">{issue.category}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-muted-foreground/50 hover:text-severity-major"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <Heart className="h-4 w-4" />
-            </Button>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-[2px] border border-border/60 text-muted-foreground/60 transition-colors group-hover:border-brand-green/50 group-hover:text-brand-green">
+              <ChevronRight className="h-4 w-4" />
+            </span>
           </div>
         </div>
         <h3 className="mb-2 font-display text-base font-semibold text-foreground group-hover:text-primary">

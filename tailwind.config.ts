@@ -68,7 +68,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "sans-serif"],
         display: ["Plus Jakarta Sans", "sans-serif"],
       },
       borderRadius: {

@@ -82,12 +82,6 @@ export default function GuidesPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {!isLoading && data && data.source !== "guides" && (
-          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            Guide table is not live yet. Run the Phase 2 SQL script, then add published guides.
-          </div>
-        )}
-
         {isLoading && (
           <div className="py-16 text-center text-muted-foreground">Loading guides...</div>
         )}
@@ -149,7 +143,7 @@ export default function GuidesPage() {
 
                 <Link
                   to={`/guides/${guide.slug}`}
-                  className="mt-4 inline-flex rounded-md bg-brand-teal px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#10313d]"
+                  className="mt-4 inline-flex rounded-[2px] border border-brand-green bg-white px-3 py-2 text-sm font-medium text-brand-teal transition-colors hover:bg-brand-green/10"
                 >
                   Read Guide
                 </Link>

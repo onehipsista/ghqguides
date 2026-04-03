@@ -123,6 +123,54 @@
     margin: 0.75rem 0;
   }
 
+  .guide-article-content h1,
+  .guide-article-content h2,
+  .guide-article-content h3 {
+    margin: 1.1rem 0 0.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+  }
+
+  .guide-article-content h1 {
+    font-size: 1.6rem;
+  }
+
+  .guide-article-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .guide-article-content hr {
+    margin: 1.1rem 0;
+    border: 0;
+    border-top: 1px solid hsl(var(--border));
+  }
+
+  .guide-article-content img {
+    margin: 0.9rem 0;
+    max-width: 100%;
+    border-radius: 0.125rem;
+  }
+
+  .guide-article-content table {
+    margin: 1rem 0;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .guide-article-content th,
+  .guide-article-content td {
+    border: 1px solid hsl(var(--border));
+    padding: 0.45rem 0.55rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .guide-article-content th {
+    background: hsl(var(--muted));
+    font-weight: 600;
+  }
+
   .guide-article-content ul {
     margin: 0.75rem 0;
     padding-left: 1.25rem;
@@ -164,6 +212,30 @@
   }
 
   .markdown-lite-editor .editor-toolbar {
+    border-color: hsl(var(--border));
+    background: hsl(var(--card));
+  }
+
+  .markdown-lite-editor .editor-toolbar button,
+  .markdown-lite-editor .editor-toolbar a {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .markdown-lite-editor .editor-toolbar button:hover,
+  .markdown-lite-editor .editor-toolbar a:hover,
+  .markdown-lite-editor .editor-toolbar button.active {
+    background: hsl(var(--muted)) !important;
+    border-color: hsl(var(--border)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .markdown-lite-editor .editor-toolbar i.separator {
+    border-color: hsl(var(--border));
+  }
+
+  .markdown-lite-editor .EasyMDEContainer .CodeMirror {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
     border-color: hsl(var(--border));
   }
 }

@@ -69,9 +69,9 @@ export default function GuideOverviewPage() {
 
   return (
     <Layout>
-      <section className="sticky top-16 z-40 border-b bg-background/95 backdrop-blur">
+      <section className="sticky top-16 z-40 border-b bg-brand-green">
         <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
-          <Link to="/guides" className="text-xs font-medium text-brand-green hover:underline">
+          <Link to="/guides" className="text-xs font-medium text-white hover:underline">
             ← Guide Library
           </Link>
         </div>

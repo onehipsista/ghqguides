@@ -14,7 +14,7 @@ type ViewMode = "list" | "cards";
 export default function AdminGuidesPage() {
   const queryClient = useQueryClient();
   const [sortBy, setSortBy] = useState<SortOption>("updated");
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [draggedGuideId, setDraggedGuideId] = useState<string | null>(null);
 

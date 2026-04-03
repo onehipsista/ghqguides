@@ -110,9 +110,9 @@ export default function GuideArticlePage() {
 
   return (
     <Layout>
-      <section className="sticky top-16 z-40 border-b bg-background/95 backdrop-blur">
+      <section className="sticky top-16 z-40 border-b bg-brand-green">
         <div className="mx-auto max-w-4xl px-4 py-2 sm:px-6 lg:px-8">
-          <Link to="/guides" className="text-xs font-medium text-brand-green hover:underline">
+          <Link to="/guides" className="text-xs font-medium text-white hover:underline">
             ← Guide Library
           </Link>
         </div>
@@ -122,12 +122,6 @@ export default function GuideArticlePage() {
         <div className="mx-auto max-w-4xl px-4 py-5 sm:px-6 lg:px-8">
           <Breadcrumb>
             <BreadcrumbList className="text-xs">
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/guides">Guide Library</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
                   <Link to={`/guides/${guideSlug}`}>{guide?.title ?? "Guide"}</Link>
@@ -183,11 +177,12 @@ export default function GuideArticlePage() {
         {guide && article && (
           <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
             <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
-              <div className="rounded-lg border bg-card p-4 lg:max-h-[calc(100vh-7.5rem)] lg:overflow-y-auto">
+              <div className="rounded-[2px] border bg-card p-4 lg:max-h-[calc(100vh-7.5rem)] lg:overflow-y-auto">
                 <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
                   <span className="material-symbols-rounded text-base text-brand-green">chrome_reader_mode</span>
                   In This Guide
                 </h2>
+                <hr className="my-3 border-border/60" />
 
                 {groupedToc.unsectioned.length > 0 && (
                   <div className="mt-4">
@@ -197,8 +192,10 @@ export default function GuideArticlePage() {
                         <li key={tocArticle.id} className="text-sm text-foreground/90">
                           <Link
                             to={`/guides/${guide.slug}/${tocArticle.slug}`}
-                            className={`block translate-x-0 rounded-md px-2 py-1 transition-all duration-200 hover:translate-x-1 hover:bg-brand-green/5 hover:text-brand-green ${
-                              tocArticle.id === article.id ? "bg-brand-green/10 text-brand-green" : ""
+                            className={`block px-3 py-2 text-sm transition-colors hover:text-brand-green ${
+                              tocArticle.id === article.id
+                                ? "border-l border-brand-green bg-brand-green/[0.025] font-medium text-brand-green"
+                                : "rounded-[2px] hover:bg-brand-green/5"
                             }`}
                           >
                             {tocArticle.title}
@@ -220,8 +217,10 @@ export default function GuideArticlePage() {
                             <li key={tocArticle.id} className="pl-3 text-sm text-foreground/90">
                               <Link
                                 to={`/guides/${guide.slug}/${tocArticle.slug}`}
-                                className={`block translate-x-0 rounded-md px-2 py-1 transition-all duration-200 hover:translate-x-1 hover:bg-brand-green/5 hover:text-brand-green ${
-                                  tocArticle.id === article.id ? "bg-brand-green/10 text-brand-green" : ""
+                                className={`block px-3 py-2 text-sm transition-colors hover:text-brand-green ${
+                                  tocArticle.id === article.id
+                                    ? "border-l border-brand-green bg-brand-green/[0.025] font-medium text-brand-green"
+                                    : "rounded-[2px] hover:bg-brand-green/5"
                                 }`}
                               >
                                 {tocArticle.title}
@@ -267,8 +266,10 @@ export default function GuideArticlePage() {
                             <Link
                               to={`/guides/${guide.slug}/${tocArticle.slug}`}
                               onClick={() => setMobileTocOpen(false)}
-                              className={`block rounded-md px-2 py-1.5 text-sm hover:bg-brand-green/5 hover:text-brand-green ${
-                                tocArticle.id === article.id ? "font-medium text-brand-green" : "text-foreground/90"
+                              className={`block px-3 py-1.5 text-sm transition-colors hover:text-brand-green ${
+                                tocArticle.id === article.id
+                                  ? "border-l border-brand-green bg-brand-green/[0.025] font-medium text-brand-green"
+                                  : "rounded-[2px] text-foreground/90 hover:bg-brand-green/5"
                               }`}
                             >
                               {tocArticle.title}
@@ -293,8 +294,10 @@ export default function GuideArticlePage() {
                               <Link
                                 to={`/guides/${guide.slug}/${tocArticle.slug}`}
                                 onClick={() => setMobileTocOpen(false)}
-                                className={`block rounded-md px-2 py-1.5 pl-3 text-sm hover:bg-brand-green/5 hover:text-brand-green ${
-                                  tocArticle.id === article.id ? "font-medium text-brand-green" : "text-foreground/90"
+                                className={`block pl-4 pr-2 py-1.5 text-sm transition-colors hover:text-brand-green ${
+                                  tocArticle.id === article.id
+                                    ? "border-l border-brand-green bg-brand-green/[0.025] font-medium text-brand-green"
+                                    : "rounded-[2px] text-foreground/90 hover:bg-brand-green/5"
                                 }`}
                               >
                                 {tocArticle.title}
@@ -351,9 +354,9 @@ export default function GuideArticlePage() {
             </div>
 
             {!!article.synopsis && (
-              <div className="mt-5 rounded-xl border bg-brand-green/5 p-4">
+              <div className="mt-5 rounded-[2px] border bg-brand-green/5 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.1em] text-brand-green">TLDR</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-foreground">{article.synopsis}</p>
+                <p className="mt-1.5 text-base font-semibold leading-relaxed text-foreground">{article.synopsis}</p>
               </div>
             )}
 
@@ -413,16 +416,16 @@ export default function GuideArticlePage() {
             </div>
 
             {(data?.relatedGuides?.length ?? 0) > 0 && (
-              <div className="mt-8 rounded-xl bg-card p-5">
+              <div className="mt-8 rounded-[4px] border border-brand-green/[0.35] bg-brand-green/[0.025] p-5">
                 <h2 className="font-display text-lg font-semibold text-foreground">Related Guides</h2>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {data?.relatedGuides.map((relatedGuide) => (
                     <Link
                       key={relatedGuide.id}
                       to={`/guides/${relatedGuide.slug}`}
-                      className="rounded-[2px] border border-[#71ba6c] bg-transparent p-3 transition-colors hover:bg-brand-green/5"
+                      className="rounded-[2px] bg-card/70 p-3 transition-colors hover:bg-brand-green/10"
                     >
-                      <p className="text-xs text-muted-foreground">{relatedGuide.category ?? "General"}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-brand-green">{relatedGuide.category ?? "General"}</p>
                       <p className="mt-1 text-sm font-semibold text-foreground">{relatedGuide.title}</p>
                     </Link>
                   ))}

@@ -7,9 +7,11 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-3">
           {/* Brand */}
           <div>
-            <span className="font-display text-lg font-bold text-brand-green">
-              GetHipQuick™
-            </span>
+            <img
+              src="/ghq_logo_w.svg"
+              alt="GetHipQuick"
+              className="h-6 w-auto"
+            />
             <p className="mt-2 text-sm text-nav-foreground/60">
               Micro-learning guides for designers who want to level up fast.
             </p>

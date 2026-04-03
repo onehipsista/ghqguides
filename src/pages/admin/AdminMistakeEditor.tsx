@@ -11,9 +11,22 @@ import { adminEmailAllowlist } from "@/lib/supabase";
 import { getAdminIssueById, saveAdminIssue } from "@/lib/admin-issues";
 import type { Severity } from "@/types/design-issue";
 
+const ISSUE_CATEGORIES = [
+  "General",
+  "Hierarchy",
+  "Typography",
+  "Color",
+  "Spacing",
+  "Alignment",
+  "Imagery",
+  "Icons",
+  "Effects",
+  "Style",
+] as const;
+
 const DEFAULT_STATE = {
   title: "",
-  category: "Typography",
+  category: "General",
   severity: "moderate" as Severity,
   body: "",
   how_to_fix: "",
@@ -146,14 +159,21 @@ export default function AdminMistakeEditorPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <Input
+              <select
                 id="category"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={form.category}
                 onChange={(event) =>
                   setForm((prev) => ({ ...prev, category: event.target.value }))
                 }
                 required
-              />
+              >
+                {ISSUE_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-2">
@@ -197,30 +217,16 @@ export default function AdminMistakeEditorPage() {
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="order_index">Order index</Label>
-              <Input
-                id="order_index"
-                type="number"
-                value={form.order_index}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, order_index: Number(event.target.value) || 0 }))
-                }
-              />
-            </div>
-
-            <div className="flex items-center gap-2 pt-8">
-              <input
-                id="published"
-                type="checkbox"
-                checked={form.published}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, published: event.target.checked }))
-                }
-              />
-              <Label htmlFor="published">Published</Label>
-            </div>
+          <div className="flex items-center gap-2">
+            <input
+              id="published"
+              type="checkbox"
+              checked={form.published}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, published: event.target.checked }))
+              }
+            />
+            <Label htmlFor="published">Published</Label>
           </div>
 
           {errorMessage && (

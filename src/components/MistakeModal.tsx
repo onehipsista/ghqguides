@@ -42,14 +42,14 @@ export function MistakeModal({
 
         <div className="space-y-4">
           <div>
-            <h4 className="mb-1.5 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              The Issue
+            <h4 className="mb-1.5 text-sm font-semibold uppercase tracking-wide text-brand-green">
+              Issue
             </h4>
             <p className="text-sm leading-relaxed text-foreground">{issue.body}</p>
           </div>
 
           <div className="border-t pt-4">
-            <h4 className="mb-1.5 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            <h4 className="mb-1.5 text-sm font-semibold uppercase tracking-wide text-brand-green">
               How to Fix
             </h4>
             {hasAccess ? (

@@ -32,6 +32,7 @@ export interface GuideArticle {
   reading_time_minutes: number | null;
   order_index: number;
   published: boolean;
+  created_at: string | null;
   updated_at: string | null;
 }
 

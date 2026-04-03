@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
@@ -10,6 +10,7 @@ import type { DesignIssue } from "@/types/design-issue";
 
 export default function AdminMistakesPage() {
   const queryClient = useQueryClient();
+  const [sortBy, setSortBy] = useState<"order" | "title" | "category" | "severity" | "published">("order");
 
   const { data: accessState, isLoading: isAccessLoading } = useQuery({
     queryKey: ["access-state"],
@@ -58,10 +59,38 @@ export default function AdminMistakesPage() {
     },
   });
 
-  const sortedIssues = useMemo(
-    () => [...issues].sort((a: DesignIssue, b: DesignIssue) => a.order_index - b.order_index),
-    [issues]
-  );
+  const sortedIssues = useMemo(() => {
+    const ordered = [...issues].sort((a: DesignIssue, b: DesignIssue) => a.order_index - b.order_index);
+
+    if (sortBy === "order") {
+      return ordered;
+    }
+
+    return [...ordered].sort((a: DesignIssue, b: DesignIssue) => {
+      if (sortBy === "published") {
+        return Number(b.published) - Number(a.published);
+      }
+
+      if (sortBy === "severity") {
+        const severityWeight: Record<DesignIssue["severity"], number> = {
+          major: 3,
+          moderate: 2,
+          minor: 1,
+        };
+        return severityWeight[b.severity] - severityWeight[a.severity];
+      }
+
+      return a[sortBy].localeCompare(b[sortBy]);
+    });
+  }, [issues, sortBy]);
+
+  const categoryCounts = useMemo(() => {
+    return issues.reduce<Record<string, number>>((acc, issue) => {
+      const key = issue.category?.trim() || "Uncategorized";
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {});
+  }, [issues]);
 
   return (
     <Layout>
@@ -93,6 +122,43 @@ export default function AdminMistakesPage() {
 
         {isAdmin && (
           <div className="mt-6 overflow-hidden rounded-xl border bg-card">
+            <div className="flex items-center justify-end border-b border-border/70 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm">
+                <label htmlFor="sortBy" className="text-muted-foreground">
+                  Sort by
+                </label>
+                <select
+                  id="sortBy"
+                  className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                  value={sortBy}
+                  onChange={(event) =>
+                    setSortBy(
+                      event.target.value as "order" | "title" | "category" | "severity" | "published"
+                    )
+                  }
+                >
+                  <option value="order">Custom order</option>
+                  <option value="title">Title</option>
+                  <option value="category">Category</option>
+                  <option value="severity">Severity</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+            </div>
+            {Object.keys(categoryCounts).length > 0 && (
+              <div className="flex flex-wrap gap-2 border-b border-border/70 px-4 py-3">
+                {Object.entries(categoryCounts)
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .map(([category, count]) => (
+                    <span
+                      key={category}
+                      className="rounded-[2px] border border-brand-green/50 bg-brand-green/[0.025] px-2 py-1 text-xs font-medium text-brand-green"
+                    >
+                      {category}: {count}
+                    </span>
+                  ))}
+              </div>
+            )}
             {isIssuesLoading ? (
               <div className="p-4 text-sm text-muted-foreground">Loading issues...</div>
             ) : isError ? (
@@ -136,7 +202,7 @@ export default function AdminMistakesPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={isMoving || index === 0}
+                            disabled={isMoving || sortBy !== "order" || index === 0}
                             onClick={() => move({ issueId: issue.id, direction: "up" })}
                             aria-label="Move up"
                           >
@@ -145,7 +211,7 @@ export default function AdminMistakesPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={isMoving || index === sortedIssues.length - 1}
+                            disabled={isMoving || sortBy !== "order" || index === sortedIssues.length - 1}
                             onClick={() => move({ issueId: issue.id, direction: "down" })}
                             aria-label="Move down"
                           >

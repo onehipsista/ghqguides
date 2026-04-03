@@ -7,16 +7,27 @@ interface MarkdownLiteEditorProps {
   onChange: (value: string) => void;
 }
 
-const toolbar = [
+const toolbar: SimpleMDE.Options["toolbar"] = [
   "bold",
   "italic",
+  "strikethrough",
+  "|",
+  "heading-1",
+  "heading-2",
+  "heading-3",
+  "|",
   "unordered-list",
+  "ordered-list",
+  "|",
+  "link",
+  "image",
+  "table",
+  "horizontal-rule",
+  "|",
   "quote",
   "code",
-  "code-block",
   "|",
   "preview",
-  "guide",
 ];
 
 export function MarkdownLiteEditor({ value, onChange }: MarkdownLiteEditorProps) {
@@ -28,7 +39,7 @@ export function MarkdownLiteEditor({ value, onChange }: MarkdownLiteEditorProps)
       autofocus: false,
       minHeight: "280px",
       placeholder: "Write article content...",
-      autoDownloadFontAwesome: false,
+      autoDownloadFontAwesome: true,
     }),
     []
   );
