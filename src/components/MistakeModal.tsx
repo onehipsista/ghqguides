@@ -35,7 +35,7 @@ export function MistakeModal({
         <DialogHeader>
           <div className="mb-2 flex items-center gap-3">
             <SeverityBadge severity={issue.severity} />
-            <span className="text-xs text-muted-foreground">{issue.category}</span>
+            <span className="text-xs font-bold uppercase tracking-[0.04em] text-muted-foreground">{issue.category}</span>
           </div>
           <DialogTitle className="font-display text-xl">{issue.title}</DialogTitle>
         </DialogHeader>
@@ -55,7 +55,7 @@ export function MistakeModal({
             {hasAccess ? (
               <p className="text-sm leading-relaxed text-foreground">{issue.how_to_fix}</p>
             ) : (
-              <div className="relative overflow-hidden rounded-xl border border-border/80 bg-card p-4">
+              <div className="relative min-h-[180px] overflow-hidden rounded-xl border border-border/80 bg-card p-4">
                 <p className="select-none text-sm leading-relaxed text-foreground opacity-70 blur-[4px]">
                   {issue.how_to_fix}
                 </p>

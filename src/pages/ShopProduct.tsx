@@ -46,22 +46,37 @@ export default function ShopProductPage() {
 
         {product && (
           <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-            <div className="overflow-hidden rounded-xl border bg-card">
-              {product.image_url ? (
-                <img src={product.image_url} alt={product.title} className="aspect-[16/11] w-full object-cover" />
-              ) : (
-                <div className="flex aspect-[16/11] w-full items-center justify-center bg-muted text-sm text-muted-foreground">
-                  No image
-                </div>
+            <div>
+              <div className="overflow-hidden rounded-xl border bg-card">
+                {product.image_url ? (
+                  <img src={product.image_url} alt={product.title} className="aspect-[4/5] w-full object-cover" />
+                ) : (
+                  <div className="flex aspect-[4/5] w-full items-center justify-center bg-muted text-sm text-muted-foreground">
+                    No image
+                  </div>
+                )}
+              </div>
+              {product.grants_guide_access && (
+                <p className="mt-4 text-xs text-muted-foreground">
+                  This product includes access to the full{" "}
+                  <Link to="/guides" className="text-brand-green hover:underline">
+                    Guide Library
+                  </Link>
+                  {" "}and{" "}
+                  <Link to="/mistakes" className="text-brand-green hover:underline">
+                    Design Mistakes
+                  </Link>
+                  {" "}content.
+                </p>
               )}
             </div>
 
             <article className="rounded-xl border bg-card p-6">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge variant="secondary">{product.category ?? "Resource"}</Badge>
-                {product.grants_guide_access && (
-                  <Badge className="bg-brand-green text-white hover:bg-brand-green">Includes Guide Access</Badge>
-                )}
+              {product.grants_guide_access && (
+                <Badge className="bg-brand-green text-white hover:bg-brand-green">Includes Guide Access</Badge>
+              )}
               </div>
 
               <h1 className="font-display text-3xl font-bold text-foreground">{product.title}</h1>
@@ -84,18 +99,17 @@ export default function ShopProductPage() {
               )}
 
               <div className="mt-6 flex items-center justify-between border-t pt-4">
-                <p className="font-display text-2xl font-bold text-foreground">
+                <p className="font-display text-2xl font-bold text-brand-green">
                   {formatProductPrice(product.price_cents, product.currency)}
                 </p>
                 {product.stripe_payment_link ? (
                   <a href={product.stripe_payment_link} target="_blank" rel="noreferrer noopener">
                     <Button size="lg" className="gap-2">
-                      <ShoppingBag className="h-4 w-4" /> Buy on Stripe
-                    </Button>
+                      <ShoppingBag className="h-4 w-4" /> Buy Now                    </Button>
                   </a>
                 ) : (
                   <Button size="lg" variant="outline" disabled>
-                    Buy link coming soon
+                   Not available.
                   </Button>
                 )}
               </div>
