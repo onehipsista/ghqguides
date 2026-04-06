@@ -101,7 +101,7 @@ export default function MistakesPage() {
           </h1>
           <p className="mt-3 max-w-3xl text-base text-nav-foreground/70">
             A searchable collection of the most frequent design mistakes — with
-            clear explanations and fixes.
+            clear explanations and fixes available. Browse them all, so you don't make them!
           </p>
 
           {/* Severity legend */}
