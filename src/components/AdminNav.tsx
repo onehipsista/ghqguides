@@ -5,8 +5,8 @@ const adminLinks = [
   { label: "Dashboard", href: "/admin" },
   { label: "Issues", href: "/admin/mistakes" },
   { label: "Guides", href: "/admin/guides" },
-  { label: "Articles", href: "/admin/articles/new" },
-  { label: "Categories", href: "/admin/categories" },
+  { label: "Blog", href: "/admin/blog" },
+  { label: "Products", href: "/admin/products" },
   { label: "Users", href: "/admin/users" },
 ];
 

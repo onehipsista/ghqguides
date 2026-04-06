@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Eye, OctagonMinus, Pencil, Sparkles, Upload } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { getAccessState } from "@/lib/access";
@@ -96,6 +97,18 @@ export default function AdminGuidesPage() {
         <h1 className="font-display text-2xl font-bold text-foreground">Admin — Guides</h1>
         <p className="mt-2 text-sm text-muted-foreground">Create and manage guide metadata and visibility.</p>
 
+        <div className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-md border bg-card p-1">
+          <Link to="/admin/guides">
+            <Button size="sm" variant="outline">Guides</Button>
+          </Link>
+          <Link to="/admin/articles/new">
+            <Button size="sm" variant="outline">Articles</Button>
+          </Link>
+          <Link to="/admin/categories">
+            <Button size="sm" variant="outline">Categories</Button>
+          </Link>
+        </div>
+
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Link to="/admin/guides/new">
             <Button>Add New Guide</Button>
@@ -141,8 +154,8 @@ export default function AdminGuidesPage() {
         </div>
 
         {viewMode === "cards" && (
-          <div className="mt-3 rounded-md border border-brand-green/20 bg-brand-green/5 px-3 py-2 text-sm text-foreground/80">
-            Drag cards onto each other to reorder guides manually. Run `phase6-guide-ordering.sql` first so the new order saves.
+          <div className="mt-3 rounded-md border border-brand-green/20 px-3 py-2 text-sm text-foreground/80">
+            Drag cards onto each other to reorder guides manually.
           </div>
         )}
 
@@ -180,12 +193,12 @@ export default function AdminGuidesPage() {
                     onDragEnd={() => setDraggedGuideId(null)}
                     className={`overflow-hidden rounded-lg border bg-transparent transition-all ${draggedGuideId === guide.id ? "scale-[0.98] opacity-60" : ""}`}
                   >
-                    <div className="aspect-[16/9] w-full bg-muted">
+                    <Link to={`/admin/guides/${guide.id}`} className="block aspect-[16/9] w-full bg-muted">
                       {guide.cover_image ? (
                         <img
                           src={getVersionedMediaUrl(guide.cover_image, guide.updated_at)}
                           alt={guide.title}
-                          className="h-full w-full object-cover"
+                          className="h-full w-full object-cover transition-opacity hover:opacity-90"
                           loading="lazy"
                         />
                       ) : (
@@ -193,7 +206,7 @@ export default function AdminGuidesPage() {
                           No cover image
                         </div>
                       )}
-                    </div>
+                    </Link>
                     <div className="p-4">
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-xs font-semibold uppercase tracking-wide text-brand-green">
@@ -219,6 +232,7 @@ export default function AdminGuidesPage() {
                           disabled={isFeaturing || isReorderingGuide}
                           onClick={() => toggleFeatured({ guideId: guide.id, featured: !guide.featured })}
                         >
+                          <Sparkles className="mr-1 h-3.5 w-3.5" />
                           {guide.featured ? "Unfeature" : "Feature"}
                         </Button>
                         <Button
@@ -227,10 +241,19 @@ export default function AdminGuidesPage() {
                           disabled={isPublishing || isReorderingGuide}
                           onClick={() => togglePublished({ guideId: guide.id, published: !guide.published })}
                         >
+                          {guide.published ? <OctagonMinus className="mr-1 h-3.5 w-3.5" /> : <Upload className="mr-1 h-3.5 w-3.5" />}
                           {guide.published ? "Unpublish" : "Publish"}
                         </Button>
+                        <Link to={`/guides/${guide.slug}`}>
+                          <Button size="sm" variant="outline">
+                            <Eye className="mr-1 h-3.5 w-3.5" />
+                            View
+                          </Button>
+                        </Link>
                         <Link to={`/admin/guides/${guide.id}`}>
-                          <Button size="sm" variant="outline">Edit</Button>
+                          <Button size="sm" variant="outline" aria-label="Edit guide" title="Edit">
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
                         </Link>
                       </div>
                     </div>
@@ -269,6 +292,7 @@ export default function AdminGuidesPage() {
                             disabled={isFeaturing || isReorderingGuide}
                             onClick={() => toggleFeatured({ guideId: guide.id, featured: !guide.featured })}
                           >
+                            <Sparkles className="mr-1 h-3.5 w-3.5" />
                             {guide.featured ? "Unfeature" : "Feature"}
                           </Button>
                           <Button
@@ -279,10 +303,19 @@ export default function AdminGuidesPage() {
                               togglePublished({ guideId: guide.id, published: !guide.published })
                             }
                           >
+                            {guide.published ? <OctagonMinus className="mr-1 h-3.5 w-3.5" /> : <Upload className="mr-1 h-3.5 w-3.5" />}
                             {guide.published ? "Unpublish" : "Publish"}
                           </Button>
+                          <Link to={`/guides/${guide.slug}`}>
+                            <Button size="sm" variant="outline">
+                              <Eye className="mr-1 h-3.5 w-3.5" />
+                              View
+                            </Button>
+                          </Link>
                           <Link to={`/admin/guides/${guide.id}`}>
-                            <Button size="sm" variant="outline">Edit</Button>
+                            <Button size="sm" variant="outline" aria-label="Edit guide" title="Edit">
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
                           </Link>
                         </div>
                       </td>

@@ -10,6 +10,7 @@ import { getAccessState } from "@/lib/access";
 import {
   addGuideSection,
   deleteGuideSection,
+  exportGuideAsMarkdown,
   getAdminGuideById,
   getGuideArticles,
   getGuideSections,
@@ -18,7 +19,8 @@ import {
   saveAdminGuide,
 } from "@/lib/admin-guides";
 import { GUIDE_AUDIENCE_OPTIONS, GUIDE_CATEGORY_OPTIONS, GUIDE_LEVEL_OPTIONS } from "@/lib/guide-options";
-import { getVersionedMediaUrl, uploadGuideCover } from "@/lib/media";
+import { ImageUpload } from "@/components/ImageUpload";
+import { getVersionedMediaUrl } from "@/lib/media";
 import { adminEmailAllowlist } from "@/lib/supabase";
 
 interface GuideFormState {
@@ -63,7 +65,6 @@ export default function AdminGuideEditorPage() {
 
   const [form, setForm] = useState<GuideFormState>(DEFAULT_STATE);
   const [newSectionTitle, setNewSectionTitle] = useState("");
-  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   const { data: accessState, isLoading: isAccessLoading } = useQuery({
@@ -153,22 +154,6 @@ export default function AdminGuideEditorPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-guide-sections", id] });
       queryClient.invalidateQueries({ queryKey: ["admin-guide-articles", id] });
-    },
-  });
-
-  const { mutate: uploadCover, isPending: isUploadingCover } = useMutation({
-    mutationFn: async () => {
-      if (!coverFile) return;
-      return uploadGuideCover(coverFile);
-    },
-    onSuccess: (url) => {
-      if (!url) return;
-      setForm((prev) => ({ ...prev, cover_image: url }));
-      setCoverFile(null);
-    },
-    onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Could not upload image.";
-      setErrorMessage(message);
     },
   });
 
@@ -325,41 +310,20 @@ export default function AdminGuideEditorPage() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="cover_image">Cover image URL</Label>
-            <Input
-              id="cover_image"
-              value={form.cover_image}
-              onChange={(event) => setForm((prev) => ({ ...prev, cover_image: event.target.value }))}
-              placeholder="https://..."
-            />
-            <div className="flex flex-wrap items-center gap-2">
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(event) => setCoverFile(event.target.files?.[0] ?? null)}
-                className="max-w-sm"
+          <ImageUpload
+            label="Cover Image"
+            value={form.cover_image || null}
+            onChange={(url) => setForm((prev) => ({ ...prev, cover_image: url }))}
+          />
+          {form.cover_image && (
+            <div className="-mt-1 overflow-hidden rounded-md border bg-muted">
+              <img
+                src={getVersionedMediaUrl(form.cover_image, guideData?.updated_at ?? new Date().toISOString())}
+                alt={form.title || "Guide cover preview"}
+                className="aspect-[16/9] w-full object-cover"
               />
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!coverFile || isUploadingCover}
-                onClick={() => uploadCover()}
-              >
-                {isUploadingCover ? "Uploading..." : "Upload Image"}
-              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">Upload uses the public <strong>guide-media</strong> bucket.</p>
-            {form.cover_image && (
-              <div className="overflow-hidden rounded-md border bg-muted">
-                <img
-                  src={getVersionedMediaUrl(form.cover_image, guideData?.updated_at ?? new Date().toISOString())}
-                  alt={form.title || "Guide cover preview"}
-                  className="aspect-[16/9] w-full object-cover"
-                />
-              </div>
-            )}
-          </div>
+          )}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="flex items-center gap-2 text-sm">
@@ -385,8 +349,30 @@ export default function AdminGuideEditorPage() {
             <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</div>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button type="submit" disabled={isSaving}>{isSaving ? "Saving..." : "Save Guide"}</Button>
+            {isEditing && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const markdown = await exportGuideAsMarkdown(id as string);
+                    const blob = new Blob([markdown], { type: "text/markdown" });
+                    const url = URL.createObjectURL(blob);
+                    const anchor = document.createElement("a");
+                    anchor.href = url;
+                    anchor.download = `${form.slug || "guide"}.md`;
+                    anchor.click();
+                    URL.revokeObjectURL(url);
+                  } catch (error) {
+                    alert(error instanceof Error ? error.message : "Export failed.");
+                  }
+                }}
+              >
+                Export Markdown
+              </Button>
+            )}
             <Link to="/admin/guides">
               <Button type="button" variant="outline">Cancel</Button>
             </Link>

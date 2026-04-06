@@ -138,7 +138,7 @@ export default function GuidesPage() {
                     </>
                   )}
                 </div>
-                <div className="mt-3 border-t border-[#dde8e2]" />
+                <div className="mt-3 border-t border-border" />
                 <p className="mt-3 line-clamp-3 text-sm text-foreground/85">{guide.description}</p>
 
                 <Link

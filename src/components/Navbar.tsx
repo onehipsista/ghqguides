@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAccessState } from "@/lib/access";
 import { adminEmailAllowlist } from "@/lib/supabase";
@@ -10,10 +10,14 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth";
 
 const baseNavLinks = [
-  { label: "Common Design Issues", href: "/mistakes" },
+  { label: "Design Mistakes", href: "/mistakes" },
   { label: "Guide Library", href: "/guides" },
-  { label: "Search", href: "/search" },
-  { label: "Account", href: "/login" },
+  { label: "Shop", href: "/shop" },
+  { label: "Blog", href: "/blog" },
+];
+
+const externalNavLinks = [
+  { label: "Design Check", href: "https://app.gethipquick.com" },
 ];
 
 export function Navbar() {
@@ -66,10 +70,35 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {externalNavLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-md px-3 py-2 text-sm font-medium text-nav-foreground/70 transition-colors hover:text-nav-foreground"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            <Link
+              to="/search"
+              className="hidden md:inline-flex"
+              aria-label="Search"
+              title="Search"
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-nav-foreground/70 hover:bg-white/5 hover:text-nav-foreground"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </Link>
             {isAuthenticated ? (
               <Button
                 variant="outline"
@@ -123,6 +152,28 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+
+            {externalNavLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                className="block rounded-md px-3 py-2 text-base font-medium text-nav-foreground/70 transition-colors hover:bg-white/5 hover:text-nav-foreground"
+              >
+                {link.label}
+              </a>
+            ))}
+
+            <Link
+              to="/search"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-nav-foreground/70 transition-colors hover:bg-white/5 hover:text-nav-foreground"
+            >
+              <Search className="h-4 w-4" />
+              Search
+            </Link>
 
             {isAuthenticated ? (
               <button

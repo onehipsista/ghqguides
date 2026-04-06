@@ -17,17 +17,22 @@ export const getVersionedMediaUrl = (url: string | null | undefined, version?: s
   }
 };
 
-export const uploadGuideCover = async (file: File): Promise<string> => {
+/** Generic uploader for any public Supabase Storage bucket. */
+export const uploadToPublicBucket = async (
+  file: File,
+  bucket: string = GUIDE_MEDIA_BUCKET,
+  folder: string = "covers"
+): Promise<string> => {
   if (!supabase) {
     throw new Error("Supabase is not configured.");
   }
 
   const extension = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const fileName = `${crypto.randomUUID()}.${extension}`;
-  const filePath = `covers/${fileName}`;
+  const filePath = `${folder}/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
-    .from(GUIDE_MEDIA_BUCKET)
+    .from(bucket)
     .upload(filePath, file, {
       upsert: false,
       contentType: file.type || undefined,
@@ -37,10 +42,14 @@ export const uploadGuideCover = async (file: File): Promise<string> => {
     throw new Error(uploadError.message);
   }
 
-  const { data } = supabase.storage.from(GUIDE_MEDIA_BUCKET).getPublicUrl(filePath);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
   if (!data?.publicUrl) {
     throw new Error("Could not generate public URL for uploaded file.");
   }
 
   return data.publicUrl;
 };
+
+/** Convenience wrapper — upload a guide cover image to the guide-media bucket. */
+export const uploadGuideCover = (file: File): Promise<string> =>
+  uploadToPublicBucket(file, GUIDE_MEDIA_BUCKET, "covers");

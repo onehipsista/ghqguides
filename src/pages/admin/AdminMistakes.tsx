@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Copy, OctagonMinus, Pencil, Upload } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { getAccessState } from "@/lib/access";
@@ -189,7 +190,11 @@ export default function AdminMistakesPage() {
                 <tbody className="divide-y divide-border">
                   {sortedIssues.map((issue, index) => (
                     <tr key={issue.id}>
-                      <td className="px-4 py-3 text-sm text-foreground">{issue.title}</td>
+                      <td className="px-4 py-3 text-sm text-foreground">
+                        <Link to={`/admin/mistakes/${issue.id}`} className="font-medium hover:text-brand-green hover:underline">
+                          {issue.title}
+                        </Link>
+                      </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{issue.category}</td>
                       <td className="px-4 py-3 text-sm capitalize text-muted-foreground">
                         {issue.severity}
@@ -218,17 +223,19 @@ export default function AdminMistakesPage() {
                             ↓
                           </Button>
                           <Link to={`/admin/mistakes/${issue.id}`}>
-                            <Button size="sm" variant="outline">
-                              Edit
+                            <Button size="sm" variant="outline" aria-label="Edit issue" title="Edit">
+                              <Pencil className="h-3.5 w-3.5" />
                             </Button>
                           </Link>
                           <Button
                             size="sm"
                             variant="outline"
+                            aria-label="Duplicate issue"
+                            title="Duplicate"
                             disabled={isDuplicating}
                             onClick={() => duplicate(issue.id)}
                           >
-                            Duplicate
+                            <Copy className="h-3.5 w-3.5" />
                           </Button>
                           <Button
                             size="sm"
@@ -241,6 +248,7 @@ export default function AdminMistakesPage() {
                               })
                             }
                           >
+                            {issue.published ? <OctagonMinus className="mr-1 h-3.5 w-3.5" /> : <Upload className="mr-1 h-3.5 w-3.5" />}
                             {issue.published ? "Unpublish" : "Publish"}
                           </Button>
                         </div>

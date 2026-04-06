@@ -126,7 +126,7 @@ export default function GuideOverviewPage() {
                 <div className="mt-4 hidden space-y-4 lg:block">
                   {grouped.unsectioned.length > 0 && (
                     <div>
-                      <h3 className="text-xs font-semibold uppercase tracking-wide text-[#134960]">
+                      <h3 className="text-xs font-semibold uppercase tracking-wide text-brand-teal">
                         Quick Start
                       </h3>
                       <ul className="mt-2 space-y-1.5">
@@ -149,7 +149,7 @@ export default function GuideOverviewPage() {
 
                     return (
                       <div key={section.id}>
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-[#134960]">
+                        <h3 className="text-xs font-semibold uppercase tracking-wide text-brand-teal">
                           {section.title}
                         </h3>
                         <ul className="mt-2 space-y-1.5">
@@ -189,7 +189,7 @@ export default function GuideOverviewPage() {
                       {grouped.unsectioned.length > 0 && (
                         <div>
                           {(data?.sections?.length ?? 0) > 0 && (
-                            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#134960]">
+                            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-brand-teal">
                               Quick Start
                             </p>
                           )}
@@ -214,7 +214,7 @@ export default function GuideOverviewPage() {
                         if (!sectionArticles.length) return null;
                         return (
                           <div key={section.id}>
-                            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#134960]">
+                            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-brand-teal">
                               {section.title}
                             </p>
                             <ul className="space-y-0.5">
@@ -257,7 +257,7 @@ export default function GuideOverviewPage() {
               {data?.articles?.[0] && (
                 <Link
                   to={`/guides/${guide.slug}/${data.articles[0].slug}`}
-                  className="mt-5 inline-flex rounded-md bg-brand-teal px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#10313d]"
+                  className="mt-5 inline-flex rounded-md bg-brand-teal px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-nav"
                 >
                   Read Guide
                 </Link>

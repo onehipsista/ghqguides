@@ -7,7 +7,7 @@
 
 @layer base {
   :root {
-    --background: 210 20% 96%;
+    --background: 40 27% 98%;
     --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
@@ -237,5 +237,59 @@
     background: hsl(var(--background));
     color: hsl(var(--foreground));
     border-color: hsl(var(--border));
+  }
+
+  .markdown-lite-editor .ql-toolbar {
+    border-color: hsl(var(--border));
+    background: hsl(var(--card));
+  }
+
+  .markdown-lite-editor .ql-toolbar .ql-picker,
+  .markdown-lite-editor .ql-toolbar button {
+    color: hsl(var(--foreground));
+    font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  }
+
+  .markdown-lite-editor .ql-toolbar button:hover,
+  .markdown-lite-editor .ql-toolbar button:focus,
+  .markdown-lite-editor .ql-toolbar button.ql-active,
+  .markdown-lite-editor .ql-toolbar .ql-picker-label:hover,
+  .markdown-lite-editor .ql-toolbar .ql-picker-label.ql-active {
+    color: hsl(var(--brand-green));
+  }
+
+  .markdown-lite-editor .ql-toolbar button:hover .ql-stroke,
+  .markdown-lite-editor .ql-toolbar button:focus .ql-stroke,
+  .markdown-lite-editor .ql-toolbar button.ql-active .ql-stroke,
+  .markdown-lite-editor .ql-toolbar .ql-picker-label:hover .ql-stroke,
+  .markdown-lite-editor .ql-toolbar .ql-picker-label.ql-active .ql-stroke {
+    stroke: hsl(var(--brand-green));
+  }
+
+  .markdown-lite-editor .ql-toolbar button:hover .ql-fill,
+  .markdown-lite-editor .ql-toolbar button:focus .ql-fill,
+  .markdown-lite-editor .ql-toolbar button.ql-active .ql-fill,
+  .markdown-lite-editor .ql-toolbar .ql-picker-label:hover .ql-fill,
+  .markdown-lite-editor .ql-toolbar .ql-picker-label.ql-active .ql-fill {
+    fill: hsl(var(--brand-green));
+  }
+
+  .markdown-lite-editor .ql-container {
+    border-color: hsl(var(--border));
+    background: hsl(var(--background));
+    font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  }
+
+  .markdown-lite-editor .ql-editor {
+    min-height: 280px;
+    font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .markdown-lite-editor .ql-editor.ql-blank::before {
+    color: hsl(var(--muted-foreground));
+    font-style: normal;
+    font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
   }
 }

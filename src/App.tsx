@@ -14,6 +14,10 @@ import SearchPage from "./pages/Search.tsx";
 import LoginPage from "./pages/Login.tsx";
 import BillingSuccessPage from "./pages/BillingSuccess.tsx";
 import BillingCancelPage from "./pages/BillingCancel.tsx";
+import ShopPage from "./pages/Shop.tsx";
+import ShopProductPage from "./pages/ShopProduct.tsx";
+import BlogPage from "./pages/Blog.tsx";
+import BlogPostPage from "./pages/BlogPost.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 // Lazy — article page pulls in react-markdown + remark-gfm
@@ -28,6 +32,10 @@ const AdminGuideEditorPage = lazy(() => import("./pages/admin/AdminGuideEditor.t
 const AdminArticleEditorPage = lazy(() => import("./pages/admin/AdminArticleEditor.tsx"));
 const AdminCategoriesPage = lazy(() => import("./pages/admin/AdminCategories.tsx"));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsers.tsx"));
+const AdminProductsPage = lazy(() => import("./pages/admin/AdminProducts.tsx"));
+const AdminProductEditorPage = lazy(() => import("./pages/admin/AdminProductEditor.tsx"));
+const AdminBlogPage = lazy(() => import("./pages/admin/AdminBlog.tsx"));
+const AdminPostEditorPage = lazy(() => import("./pages/admin/AdminPostEditor.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -49,6 +57,10 @@ const App = () => (
           <Route path="/mistakes" element={<MistakesPage />} />
           <Route path="/guides" element={<GuidesPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/shop/:slug" element={<ShopProductPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/guides/:slug" element={<GuideOverviewPage />} />
           <Route path="/guides/:slug/:articleSlug" element={<GuideArticlePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -65,6 +77,12 @@ const App = () => (
           <Route path="/admin/articles/:id" element={<AdminArticleEditorPage />} />
           <Route path="/admin/categories" element={<AdminCategoriesPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin/products" element={<AdminProductsPage />} />
+          <Route path="/admin/products/new" element={<AdminProductEditorPage />} />
+          <Route path="/admin/products/:id" element={<AdminProductEditorPage />} />
+          <Route path="/admin/blog" element={<AdminBlogPage />} />
+          <Route path="/admin/blog/new" element={<AdminPostEditorPage />} />
+          <Route path="/admin/blog/:id" element={<AdminPostEditorPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

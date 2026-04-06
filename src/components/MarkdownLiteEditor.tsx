@@ -1,55 +1,74 @@
 import { useMemo } from "react";
-import SimpleMDE from "react-simplemde-editor";
-import "easymde/dist/easymde.min.css";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 interface MarkdownLiteEditorProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-const toolbar: SimpleMDE.Options["toolbar"] = [
-  "bold",
-  "italic",
-  "strikethrough",
-  "|",
-  "heading-1",
-  "heading-2",
-  "heading-3",
-  "|",
-  "unordered-list",
-  "ordered-list",
-  "|",
-  "link",
-  "image",
-  "table",
-  "horizontal-rule",
-  "|",
-  "quote",
-  "code",
-  "|",
-  "preview",
-];
+const looksLikeHtml = (input: string) => /<\/?[a-z][\s\S]*>/i.test(input);
 
 export function MarkdownLiteEditor({ value, onChange }: MarkdownLiteEditorProps) {
-  const options = useMemo(
+  const modules = useMemo(
     () => ({
-      spellChecker: false,
-      status: ["lines", "words"],
-      toolbar,
-      autofocus: false,
-      minHeight: "280px",
-      placeholder: "Write article content...",
-      autoDownloadFontAwesome: true,
+      toolbar: [
+        [{ header: [1, 2, 3, false] }],
+        ["bold", "italic", "underline", "strike"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        ["blockquote", "code-block"],
+        ["link", "image"],
+        [{ color: [] }, { background: [] }],
+        ["clean"],
+      ],
     }),
     []
   );
 
+  const formats = useMemo(
+    () => [
+      "header",
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "list",
+      "bullet",
+      "blockquote",
+      "code-block",
+      "link",
+      "image",
+      "color",
+      "background",
+    ],
+    []
+  );
+
+  const normalizedValue = useMemo(() => {
+    if (!value) return "";
+    if (looksLikeHtml(value)) return value;
+
+    // If old markdown/plain text exists, preserve readability by converting
+    // newlines to paragraphs/line-breaks for Quill editing.
+    const escaped = value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    return escaped
+      .split(/\n\n+/)
+      .map((block) => `<p>${block.replace(/\n/g, "<br/>")}</p>`)
+      .join("");
+  }, [value]);
+
   return (
-    <div className="markdown-lite-editor">
-      <SimpleMDE
-        value={value}
+    <div className="markdown-lite-editor rounded-lg border bg-card">
+      <ReactQuill
+        theme="snow"
+        value={normalizedValue}
         onChange={(nextValue) => onChange(nextValue ?? "")}
-        options={options}
+        modules={modules}
+        formats={formats}
       />
     </div>
   );

@@ -499,3 +499,78 @@ export const moveGuideArticle = async (guideId: string, articleId: string, direc
     .eq("id", target.id);
   if (secondError) throw secondError;
 };
+
+// ---------------------------------------------------------------------------
+// Markdown export
+// ---------------------------------------------------------------------------
+
+/**
+ * Assembles a full guide (metadata + sections + articles) into a single
+ * Markdown string with YAML frontmatter.  Safe to call client-side — reads
+ * only published/draft articles via the admin queries already available.
+ */
+export const exportGuideAsMarkdown = async (guideId: string): Promise<string> => {
+  const [guide, sections, articles] = await Promise.all([
+    getAdminGuideById(guideId),
+    getGuideSections(guideId),
+    getGuideArticles(guideId),
+  ]);
+
+  if (!guide) throw new Error("Guide not found.");
+
+  const now = new Date().toISOString();
+
+  // --- YAML frontmatter ---
+  const frontmatter = [
+    "---",
+    `title: "${guide.title.replace(/"/g, '\\"')}"`,
+    `slug: "${guide.slug}"`,
+    `category: "${guide.category ?? ""}"`,
+    `audience_market: "${guide.audience_market ?? ""}"`,
+    `level: "${guide.level ?? ""}"`,
+    `published: ${guide.published}`,
+    `exported_at: "${now}"`,
+    "---",
+  ].join("\n");
+
+  const lines: string[] = [frontmatter, "", `# ${guide.title}`, ""];
+
+  if (guide.description) {
+    lines.push(guide.description, "");
+  }
+
+  // Group articles by section
+  const sectionMap = new Map<string | null, typeof articles>();
+  sectionMap.set(null, []);
+  for (const section of sections) {
+    sectionMap.set(section.id, []);
+  }
+  for (const article of articles) {
+    const key = article.section_id ?? null;
+    const bucket = sectionMap.get(key) ?? sectionMap.get(null)!;
+    bucket.push(article);
+  }
+
+  // Emit un-sectioned articles first
+  const unsectioned = sectionMap.get(null) ?? [];
+  for (const article of unsectioned) {
+    lines.push(`## ${article.title}`, "");
+    if (article.content) {
+      lines.push(article.content.trim(), "");
+    }
+  }
+
+  // Emit sections with their articles
+  for (const section of sections) {
+    lines.push(`## ${section.title}`, "");
+    const sectionArticles = sectionMap.get(section.id) ?? [];
+    for (const article of sectionArticles) {
+      lines.push(`### ${article.title}`, "");
+      if (article.content) {
+        lines.push(article.content.trim(), "");
+      }
+    }
+  }
+
+  return lines.join("\n");
+};

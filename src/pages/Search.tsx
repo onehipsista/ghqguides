@@ -46,15 +46,17 @@ export default function SearchPage() {
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-green">Global Search</p>
           <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">Search Mistakes + Guides</h1>
 
-          <form onSubmit={onSubmit} className="relative mt-6 max-w-2xl">
-            <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-nav-foreground/50" />
-            <Input
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Search by keyword..."
-              className="border-white/20 bg-white/5 pl-9 text-white placeholder:text-nav-foreground/50"
-            />
-            <Button type="submit" className="mt-3" size="sm">
+          <form onSubmit={onSubmit} className="mt-6 flex max-w-xl items-center gap-2">
+            <div className="relative flex-1">
+              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-nav-foreground/50" />
+              <Input
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Search by keyword..."
+                className="border-white/20 bg-white/5 pl-9 text-white placeholder:text-nav-foreground/50"
+              />
+            </div>
+            <Button type="submit" size="sm" className="shrink-0">
               Search
             </Button>
           </form>

@@ -16,9 +16,14 @@ const cards = [
     href: "/admin/guides",
   },
   {
-    title: "Categories",
-    description: "Add, rename, and delete categories.",
-    href: "/admin/categories",
+    title: "Products",
+    description: "Manage shop products, prices, and Stripe payment links.",
+    href: "/admin/products",
+  },
+  {
+    title: "Blog",
+    description: "Write and publish blog posts, manage categories.",
+    href: "/admin/blog",
   },
   {
     title: "New Article",

@@ -186,7 +186,7 @@ export default function GuideArticlePage() {
 
                 {groupedToc.unsectioned.length > 0 && (
                   <div className="mt-4">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-[#134960]">Quick Start</h3>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-brand-teal">Quick Start</h3>
                     <ul className="mt-2 space-y-1.5">
                       {groupedToc.unsectioned.map((tocArticle) => (
                         <li key={tocArticle.id} className="text-sm text-foreground/90">
@@ -211,7 +211,7 @@ export default function GuideArticlePage() {
                     const sectionArticles = groupedToc.articlesBySection.get(tocSection.id) ?? [];
                     return (
                       <div key={tocSection.id}>
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-[#134960]">{tocSection.title}</h3>
+                        <h3 className="text-xs font-semibold uppercase tracking-wide text-brand-teal">{tocSection.title}</h3>
                         <ul className="mt-2 space-y-1.5">
                           {sectionArticles.map((tocArticle) => (
                             <li key={tocArticle.id} className="pl-3 text-sm text-foreground/90">
@@ -256,7 +256,7 @@ export default function GuideArticlePage() {
                   {groupedToc.unsectioned.length > 0 && (
                     <div>
                       {groupedToc.sections.length > 0 && (
-                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#134960]">
+                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-brand-teal">
                           Quick Start
                         </p>
                       )}
@@ -285,7 +285,7 @@ export default function GuideArticlePage() {
                     if (!sectionArticles.length) return null;
                     return (
                       <div key={tocSection.id}>
-                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[#134960]">
+                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-brand-teal">
                           {tocSection.title}
                         </p>
                         <ul className="space-y-0.5">

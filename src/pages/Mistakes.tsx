@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MistakeCard } from "@/components/MistakeCard";
 import { MistakeModal } from "@/components/MistakeModal";
-import { CATEGORIES } from "@/lib/mock-data";
 import { getPublicIssues } from "@/lib/design-issues";
 import { getAccessState } from "@/lib/access";
 import { createCheckoutSession } from "@/lib/billing";
@@ -59,9 +58,21 @@ export default function MistakesPage() {
     startCheckout();
   };
 
-  const issues = data?.issues ?? [];
+  const categoryOptions = useMemo(() => {
+    const published = (data?.issues ?? []).filter((issue) => issue.published);
+    const dynamic = Array.from(
+      new Set(
+        published
+          .map((issue) => issue.category?.trim())
+          .filter((value): value is string => Boolean(value))
+      )
+    ).sort((a, b) => a.localeCompare(b));
+
+    return ["All Categories", ...dynamic];
+  }, [data?.issues]);
 
   const filtered = useMemo(() => {
+    const issues = data?.issues ?? [];
     return issues.filter((issue) => {
       if (!issue.published) return false;
       if (category !== "All Categories" && issue.category !== category) return false;
@@ -75,7 +86,7 @@ export default function MistakesPage() {
       }
       return true;
     });
-  }, [issues, search, category, severity]);
+  }, [data?.issues, search, category, severity]);
 
   return (
     <Layout>
@@ -86,11 +97,11 @@ export default function MistakesPage() {
             Micro Guides
           </p>
           <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Common Design Issues
+            Design Mistakes
           </h1>
-          <p className="mt-3 max-w-2xl text-base text-nav-foreground/70">
+          <p className="mt-3 max-w-3xl text-base text-nav-foreground/70">
             A searchable collection of the most frequent design mistakes — with
-            clear explanations and actionable fixes.
+            clear explanations and fixes.
           </p>
 
           {/* Severity legend */}
@@ -127,7 +138,7 @@ export default function MistakesPage() {
 
           {/* Category pills */}
           <div className="mb-3 flex flex-wrap gap-2">
-            {CATEGORIES.map((cat) => (
+            {categoryOptions.map((cat) => (
               <Button
                 key={cat}
                 variant={category === cat ? "default" : "outline"}
@@ -169,23 +180,14 @@ export default function MistakesPage() {
 
       {/* Card grid */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {data?.source !== "design_issues" && (
-          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            Connected in fallback mode ({data?.source ?? "mock"}). We'll use your
-            dedicated design issues table as soon as it is available.
-          </div>
-        )}
-
         {isLoading && (
           <div className="py-16 text-center">
-            <p className="text-muted-foreground">Loading design issues...</p>
+            <p className="text-muted-foreground">Loading design mistakes...</p>
           </div>
         )}
 
         {isError && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-            We couldn't load live data right now. Showing fallback data so you can keep working.
-          </div>
+          <div className="py-4" />
         )}
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -214,7 +216,7 @@ export default function MistakesPage() {
               Unlock All Design Issues
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              You’re previewing {Math.min(FREE_CARD_LIMIT, filtered.length)} of {issues.length} issues. Unlock full searchable access and all “How to Fix” solutions.
+              You're previewing {Math.min(FREE_CARD_LIMIT, filtered.length)} of {data?.issues?.length ?? 0} issues. Unlock full searchable access and all "How to Fix" solutions.
             </p>
             <Button size="lg" className="mt-4 w-full max-w-sm" onClick={handleUpgrade} disabled={isCheckoutPending}>
               Get Full Access — {guideAccessPriceLabel}
