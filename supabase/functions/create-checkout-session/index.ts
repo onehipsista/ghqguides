@@ -1,4 +1,4 @@
-import Stripe from "https://esm.sh/stripe@14.25.0?target=denonext";
+import Stripe from "https://deno.land/x/stripe@v1.4.0/mod.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
 const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY") ?? "";
