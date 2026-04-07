@@ -43,7 +43,7 @@ export function MistakeCard({ issue, blurred, onSelect }: MistakeCardProps) {
         <div className="mb-3 flex items-center justify-between">
           <SeverityBadge severity={issue.severity} />
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-[0.04em] text-muted-foreground">{issue.category}</span>
+            <span className="text-xs font-bold uppercase tracking-[0.04em] text-brand-green">{issue.category}</span>
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-[2px] border border-border/60 text-muted-foreground/60 transition-colors group-hover:border-brand-green/50 group-hover:text-brand-green">
               <Maximize2 className="h-4 w-4" />
             </span>

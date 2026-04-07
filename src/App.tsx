@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound.tsx";
 
 // Lazy — article page pulls in react-markdown + remark-gfm
 const GuideArticlePage = lazy(() => import("./pages/GuideArticle.tsx"));
+const BillingCheckoutPage = lazy(() => import("./pages/BillingCheckout.tsx"));
 
 // Lazy — admin pages pull in SimpleMDE/EasyMDE (~900 KB) only when visited
 const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboard.tsx"));
@@ -64,6 +65,7 @@ const App = () => (
           <Route path="/guides/:slug" element={<GuideOverviewPage />} />
           <Route path="/guides/:slug/:articleSlug" element={<GuideArticlePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/billing/checkout" element={<BillingCheckoutPage />} />
           <Route path="/billing/success" element={<BillingSuccessPage />} />
           <Route path="/billing/cancel" element={<BillingCancelPage />} />
           <Route path="/admin" element={<AdminDashboardPage />} />

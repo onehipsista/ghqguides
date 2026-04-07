@@ -15,7 +15,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { getAccessState } from "@/lib/access";
-import { createCheckoutSession } from "@/lib/billing";
+import { startGuideAccessCheckout } from "@/lib/billing";
 import { getGuideArticleBySlugs } from "@/lib/guides";
 import { guideAccessPriceLabel } from "@/lib/app-config";
 
@@ -43,8 +43,13 @@ export default function GuideArticlePage() {
   });
 
   const { mutate: startCheckout, isPending: isCheckoutPending } = useMutation({
-    mutationFn: createCheckoutSession,
-    onSuccess: (url) => {
+    mutationFn: startGuideAccessCheckout,
+    onSuccess: ({ mode, url }) => {
+      if (mode === "embedded") {
+        navigate(url);
+        return;
+      }
+
       window.location.href = url;
     },
   });

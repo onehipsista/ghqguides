@@ -9,7 +9,7 @@ import { MistakeCard } from "@/components/MistakeCard";
 import { MistakeModal } from "@/components/MistakeModal";
 import { getPublicIssues } from "@/lib/design-issues";
 import { getAccessState } from "@/lib/access";
-import { createCheckoutSession } from "@/lib/billing";
+import { startGuideAccessCheckout } from "@/lib/billing";
 import { guideAccessPriceLabel } from "@/lib/app-config";
 import type { DesignIssue, Severity } from "@/types/design-issue";
 import { cn } from "@/lib/utils";
@@ -43,8 +43,13 @@ export default function MistakesPage() {
   const isLoggedIn = Boolean(accessState?.isLoggedIn);
 
   const { mutate: startCheckout, isPending: isCheckoutPending } = useMutation({
-    mutationFn: createCheckoutSession,
-    onSuccess: (url) => {
+    mutationFn: startGuideAccessCheckout,
+    onSuccess: ({ mode, url }) => {
+      if (mode === "embedded") {
+        navigate(url);
+        return;
+      }
+
       window.location.href = url;
     },
   });
@@ -97,7 +102,7 @@ export default function MistakesPage() {
             Micro Guides
           </p>
           <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Design Mistakes
+            Design <span className="text-brand-green-light">Mistakes</span>
           </h1>
           <p className="mt-3 max-w-3xl text-base text-nav-foreground/70">
             A searchable collection of the most frequent design mistakes — with
@@ -107,15 +112,15 @@ export default function MistakesPage() {
           {/* Severity legend */}
           <div className="mt-6 flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-severity-minor" />
+              <span className="h-3 w-3 rounded-md bg-severity-minor" />
               <span className="text-sm text-nav-foreground/60">Minor — cosmetic polish</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-severity-moderate" />
+              <span className="h-3 w-3 rounded-md bg-severity-moderate" />
               <span className="text-sm text-nav-foreground/60">Moderate — affects usability</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-severity-major" />
+              <span className="h-3 w-3 rounded-md bg-severity-major" />
               <span className="text-sm text-nav-foreground/60">Major — breaks experience</span>
             </div>
           </div>
@@ -143,7 +148,7 @@ export default function MistakesPage() {
                 key={cat}
                 variant={category === cat ? "default" : "outline"}
                 size="sm"
-                className="h-8 rounded-full text-xs"
+                className="h-8 rounded-md text-xs"
                 onClick={() => setCategory(cat)}
               >
                 {cat}
@@ -158,7 +163,7 @@ export default function MistakesPage() {
                 key={s.value}
                 variant={severity === s.value ? "default" : "outline"}
                 size="sm"
-                className="h-8 rounded-full text-xs"
+                className="h-8 rounded-md text-xs"
                 onClick={() => setSeverity(s.value)}
               >
                 {s.value !== "all" && (
