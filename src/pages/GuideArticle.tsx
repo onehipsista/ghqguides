@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronDown, Clock3, Lock, Users } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -25,6 +25,7 @@ function looksLikeHtml(value: string) {
 
 export default function GuideArticlePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const params = useParams();
   const guideSlug = params.slug ?? "";
   const articleSlug = params.articleSlug ?? "";
@@ -59,7 +60,11 @@ export default function GuideArticlePage() {
 
   const handleUpgrade = () => {
     if (!isLoggedIn) {
-      navigate("/login");
+      navigate("/login", {
+        state: {
+          from: `${location.pathname}${location.search}${location.hash}`,
+        },
+      });
       return;
     }
 

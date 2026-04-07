@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 type AuthMode = "signin" | "signup";
 
 export default function LoginPage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const [mode, setMode] = useState<AuthMode>("signin");
@@ -19,6 +20,16 @@ export default function LoginPage() {
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const redirectParam = new URLSearchParams(location.search).get("redirect");
+  const redirectFromState =
+    typeof location.state === "object" && location.state !== null && "from" in location.state
+      ? String((location.state as { from?: string }).from ?? "")
+      : "";
+  const redirectTo =
+    (redirectFromState && redirectFromState.startsWith("/") && redirectFromState) ||
+    (redirectParam && redirectParam.startsWith("/") && redirectParam) ||
+    "/";
 
   if (!supabase) {
     return (
@@ -41,7 +52,7 @@ export default function LoginPage() {
   }
 
   if (!isLoading && isAuthenticated) {
-    return <Navigate to="/mistakes" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   const onSubmit = async (event: FormEvent) => {
@@ -59,7 +70,7 @@ export default function LoginPage() {
         return;
       }
 
-      navigate("/mistakes");
+      navigate(redirectTo, { replace: true });
       setIsSubmitting(false);
       return;
     }

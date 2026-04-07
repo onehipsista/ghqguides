@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Search } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ const SEVERITY_FILTERS: Array<{ label: string; value: Severity | "all" }> = [
 
 export default function MistakesPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All Categories");
   const [severity, setSeverity] = useState<Severity | "all">("all");
@@ -56,7 +57,11 @@ export default function MistakesPage() {
 
   const handleUpgrade = () => {
     if (!isLoggedIn) {
-      navigate("/login");
+      navigate("/login", {
+        state: {
+          from: `${location.pathname}${location.search}${location.hash}`,
+        },
+      });
       return;
     }
 

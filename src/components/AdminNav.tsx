@@ -21,18 +21,18 @@ export function AdminNav() {
   };
 
   return (
-    <div className="sticky top-16 z-40 border-b bg-muted/40 backdrop-blur">
+    <div className="sticky top-16 z-40 border-b border-brand-green-light/40 bg-brand-green shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <nav className="flex items-center gap-1 overflow-x-auto py-1">
+        <nav className="flex items-center gap-2 overflow-x-auto py-3">
           {adminLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
               className={cn(
-                "shrink-0 rounded-[2px] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors",
+                "shrink-0 rounded-md px-4 py-2 text-sm font-medium transition-colors",
                 isActive(link.href)
-                  ? "bg-brand-green text-white"
-                  : "text-muted-foreground hover:bg-brand-green/10 hover:text-brand-green"
+                  ? "bg-white text-brand-green"
+                  : "text-white/95 hover:bg-white/15 hover:text-white"
               )}
             >
               {link.label}

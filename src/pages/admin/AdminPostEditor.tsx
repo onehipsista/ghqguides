@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -59,6 +59,7 @@ const DEFAULT_STATE: PostFormState = {
 export default function AdminPostEditorPage() {
   const { id } = useParams();
   const isEditing = Boolean(id);
+  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -158,7 +159,13 @@ export default function AdminPostEditorPage() {
   };
 
   if (!isAccessLoading && !isAdmin) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+        replace
+      />
+    );
   }
 
   return (

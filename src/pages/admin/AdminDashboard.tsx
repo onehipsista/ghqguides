@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { getAccessState } from "@/lib/access";
@@ -38,6 +38,7 @@ const cards = [
 ];
 
 export default function AdminDashboardPage() {
+  const location = useLocation();
   const { data: accessState, isLoading } = useQuery({
     queryKey: ["access-state"],
     queryFn: getAccessState,
@@ -50,7 +51,13 @@ export default function AdminDashboardPage() {
   const isAdmin = isAdminByRole || isAdminByAllowlist;
 
   if (!isLoading && !isAdmin) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+        replace
+      />
+    );
   }
 
   return (

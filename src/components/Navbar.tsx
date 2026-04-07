@@ -35,6 +35,7 @@ export function Navbar() {
     accessState?.email && adminEmailAllowlist.includes(accessState.email.toLowerCase())
   );
   const isAdmin = isAdminByRole || isAdminByAllowlist;
+  const loginHref = `/login?redirect=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`;
 
   const navLinks = isAdmin
     ? [...baseNavLinks, { label: "Admin", href: "/admin" }]
@@ -55,7 +56,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden items-center gap-1 md:flex">
+          <div className="hidden items-center gap-1 lg:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -87,7 +88,7 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <Link
               to="/search"
-              className="hidden md:inline-flex"
+              className="hidden lg:inline-flex"
               aria-label="Search"
               title="Search"
             >
@@ -103,13 +104,13 @@ export function Navbar() {
               <Button
                 variant="outline"
                 size="sm"
-                className="hidden border-brand-green/30 bg-transparent text-brand-green hover:bg-brand-green hover:text-primary-foreground md:inline-flex"
+                className="hidden border-brand-green/30 bg-transparent text-brand-green hover:bg-brand-green hover:text-primary-foreground lg:inline-flex"
                 onClick={handleSignOut}
               >
                 Sign Out
               </Button>
             ) : (
-              <Link to="/login" className="hidden md:inline-flex">
+              <Link to={loginHref} className="hidden lg:inline-flex">
                 <Button
                   variant="outline"
                   size="sm"
@@ -124,7 +125,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="text-nav-foreground md:hidden"
+              className="text-nav-foreground lg:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -135,7 +136,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-white/10 md:hidden">
+        <div className="border-t border-white/10 lg:hidden">
           <div className="space-y-1 px-4 py-3">
             {navLinks.map((link) => (
               <Link
@@ -188,7 +189,7 @@ export function Navbar() {
               </button>
             ) : (
               <Link
-                to="/login"
+                to={loginHref}
                 onClick={() => setMobileOpen(false)}
                 className="block rounded-md px-3 py-2 text-base font-medium text-nav-foreground/70 transition-colors hover:bg-white/5 hover:text-nav-foreground"
               >

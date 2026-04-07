@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, OctagonMinus, Pencil, Trash2, Upload } from "lucide-react";
 import { format } from "date-fns";
@@ -15,6 +15,7 @@ import {
 } from "@/lib/admin-posts";
 
 export default function AdminBlogPage() {
+  const location = useLocation();
   const queryClient = useQueryClient();
 
   const { data: accessState, isLoading: isAccessLoading } = useQuery({
@@ -52,7 +53,13 @@ export default function AdminBlogPage() {
   });
 
   if (!isAccessLoading && !isAdmin) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+        replace
+      />
+    );
   }
 
   return (

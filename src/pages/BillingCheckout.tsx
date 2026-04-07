@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -15,6 +15,7 @@ import {
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 export default function BillingCheckoutPage() {
+  const location = useLocation();
   const [isFallbackPending, setIsFallbackPending] = useState(false);
 
   const stripePromise = useMemo(
@@ -52,7 +53,13 @@ export default function BillingCheckoutPage() {
   }
 
   if (!accessState?.isLoggedIn) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+        replace
+      />
+    );
   }
 
   if (accessState.hasGuideAccess) {
@@ -100,14 +107,14 @@ export default function BillingCheckoutPage() {
         </div>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Prefer the previous flow?{" "}
+          Payment form not loading?{" "}
           <button
             type="button"
             onClick={handleHostedFallback}
             disabled={isFallbackPending}
             className="font-medium text-brand-green underline-offset-4 hover:underline disabled:opacity-70"
           >
-            Open hosted checkout
+            Use the regular payment form
           </button>
           .
         </p>
