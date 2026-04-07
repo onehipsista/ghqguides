@@ -46,42 +46,22 @@ export async function createEmbeddedCheckoutSession(): Promise<string> {
   }
 
   const email = await getCurrentUserEmail();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const { data, error } = await supabase.functions.invoke<EmbeddedCheckoutResponse>(
+    "create-checkout-session",
+    {
+      body: {
+        email,
+        returnUrl: `${window.location.origin}/billing/success`,
+        cancelUrl: `${window.location.origin}/billing/cancel`,
+      },
+    }
+  );
 
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Missing Supabase environment variables.");
+  if (error) {
+    throw new Error(error.message || "Unable to start embedded checkout.");
   }
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    apikey: supabaseAnonKey,
-  };
-
-  if (session?.access_token) {
-    headers.Authorization = `Bearer ${session.access_token}`;
-  }
-
-  const response = await fetch(`${supabaseUrl}/functions/v1/create-checkout-session`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      email,
-      returnUrl: `${window.location.origin}/billing/success`,
-      cancelUrl: `${window.location.origin}/billing/cancel`,
-    }),
-  });
-
-  if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(payload?.error || "Unable to start embedded checkout.");
-  }
-
-  const payload = (await response.json()) as EmbeddedCheckoutResponse;
+  const payload = data;
   if (!payload?.clientSecret) {
     throw new Error("Embedded checkout did not return a client secret.");
   }
