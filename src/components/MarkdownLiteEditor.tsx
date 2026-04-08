@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { SimpleRichTextEditor } from "@/components/SimpleRichTextEditor";
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 interface MarkdownLiteEditorProps {
   value: string;
@@ -9,26 +10,56 @@ interface MarkdownLiteEditorProps {
 const looksLikeHtml = (input: string) => /<\/?[a-z][\s\S]*>/i.test(input);
 
 export function MarkdownLiteEditor({ value, onChange }: MarkdownLiteEditorProps) {
+  const options = useMemo(
+    () => ({
+      spellChecker: false,
+      autofocus: false,
+      status: ["lines", "words"],
+      toolbar: [
+        "bold",
+        "italic",
+        "heading",
+        "|",
+        "quote",
+        "unordered-list",
+        "ordered-list",
+        "|",
+        "link",
+        "image",
+        "|",
+        "preview",
+        "side-by-side",
+        "fullscreen",
+        "|",
+        "guide",
+      ],
+    }),
+    []
+  );
+
   const normalizedValue = useMemo(() => {
     if (!value) return "";
-    if (looksLikeHtml(value)) return value;
+    if (!looksLikeHtml(value)) return value;
 
-    // If old markdown/plain text exists, preserve readability by converting
-    // newlines to paragraphs/line-breaks for Quill editing.
-    const escaped = value
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-
-    return escaped
-      .split(/\n\n+/)
-      .map((block) => `<p>${block.replace(/\n/g, "<br/>")}</p>`)
-      .join("");
+    // Very lightweight HTML-to-text fallback for legacy HTML content.
+    return value
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/p>\s*<p>/gi, "\n\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .trim();
   }, [value]);
 
   return (
     <div className="markdown-lite-editor rounded-lg border bg-card">
-      <SimpleRichTextEditor value={normalizedValue} onChange={(nextValue) => onChange(nextValue ?? "")} />
+      <SimpleMDE
+        value={normalizedValue}
+        onChange={(nextValue) => onChange(nextValue ?? "")}
+        options={options}
+      />
     </div>
   );
 }
