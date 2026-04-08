@@ -7,6 +7,9 @@ export interface Product {
   category: string | null;
   audience_market: string | null;
   image_url: string | null;
+  shop_thumbnail_url: string | null;
+  gallery_image_urls: string[];
+  sample_pdf_url: string | null;
   price_cents: number;
   currency: string;
   stripe_payment_link: string | null;

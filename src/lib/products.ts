@@ -15,6 +15,9 @@ interface ProductRow {
   category: string | null;
   audience_market: string | null;
   image_url: string | null;
+  shop_thumbnail_url: string | null;
+  gallery_image_urls: string[] | null;
+  sample_pdf_url: string | null;
   price_cents: number | null;
   currency: string | null;
   stripe_payment_link: string | null;
@@ -41,7 +44,7 @@ interface ProductAssetRow {
 }
 
 const PRODUCT_SELECT =
-  "id, title, slug, description, long_description, category, audience_market, image_url, price_cents, currency, stripe_payment_link, featured, published, order_index, grants_guide_access, access_scope, tags, updated_at, created_at";
+  "id, title, slug, description, long_description, category, audience_market, image_url, shop_thumbnail_url, gallery_image_urls, sample_pdf_url, price_cents, currency, stripe_payment_link, featured, published, order_index, grants_guide_access, access_scope, tags, updated_at, created_at";
 
 const toProduct = (row: ProductRow): Product => ({
   id: row.id,
@@ -52,6 +55,9 @@ const toProduct = (row: ProductRow): Product => ({
   category: row.category,
   audience_market: row.audience_market,
   image_url: row.image_url,
+  shop_thumbnail_url: row.shop_thumbnail_url,
+  gallery_image_urls: row.gallery_image_urls ?? [],
+  sample_pdf_url: row.sample_pdf_url,
   price_cents: Number(row.price_cents ?? 0),
   currency: row.currency ?? "usd",
   stripe_payment_link: row.stripe_payment_link,

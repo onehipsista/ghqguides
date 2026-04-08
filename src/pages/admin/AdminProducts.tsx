@@ -124,8 +124,17 @@ export default function AdminProductsPage() {
                             disabled={isPublishing || isDeleting || isDuplicating}
                             onClick={() => togglePublished({ id: product.id, published: !product.published })}
                           >
-                            {product.published ? <OctagonMinus className="mr-1 h-3.5 w-3.5" /> : <Upload className="mr-1 h-3.5 w-3.5" />}
-                            {product.published ? "Unpublish" : "Publish"}
+                            {product.published ? (
+                              <>
+                                <OctagonMinus className="h-3.5 w-3.5" />
+                                <span className="sr-only">Unpublish</span>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="mr-1 h-3.5 w-3.5" />
+                                Publish
+                              </>
+                            )}
                           </Button>
                           <Link to={`/admin/products/${product.id}`}>
                             <Button size="sm" variant="outline" aria-label="Edit product" title="Edit">

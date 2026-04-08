@@ -241,8 +241,17 @@ export default function AdminGuidesPage() {
                           disabled={isPublishing || isReorderingGuide}
                           onClick={() => togglePublished({ guideId: guide.id, published: !guide.published })}
                         >
-                          {guide.published ? <OctagonMinus className="mr-1 h-3.5 w-3.5" /> : <Upload className="mr-1 h-3.5 w-3.5" />}
-                          {guide.published ? "Unpublish" : "Publish"}
+                          {guide.published ? (
+                            <>
+                              <OctagonMinus className="h-3.5 w-3.5" />
+                              <span className="sr-only">Unpublish</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="mr-1 h-3.5 w-3.5" />
+                              Publish
+                            </>
+                          )}
                         </Button>
                         <Link to={`/guides/${guide.slug}`}>
                           <Button size="sm" variant="outline">
@@ -303,8 +312,17 @@ export default function AdminGuidesPage() {
                               togglePublished({ guideId: guide.id, published: !guide.published })
                             }
                           >
-                            {guide.published ? <OctagonMinus className="mr-1 h-3.5 w-3.5" /> : <Upload className="mr-1 h-3.5 w-3.5" />}
-                            {guide.published ? "Unpublish" : "Publish"}
+                            {guide.published ? (
+                              <>
+                                <OctagonMinus className="h-3.5 w-3.5" />
+                                <span className="sr-only">Unpublish</span>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="mr-1 h-3.5 w-3.5" />
+                                Publish
+                              </>
+                            )}
                           </Button>
                           <Link to={`/guides/${guide.slug}`}>
                             <Button size="sm" variant="outline">

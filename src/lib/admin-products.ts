@@ -10,6 +10,9 @@ export interface AdminProductInput {
   category: string | null;
   audience_market: string | null;
   image_url: string | null;
+  shop_thumbnail_url: string | null;
+  gallery_image_urls: string[];
+  sample_pdf_url: string | null;
   price_cents: number;
   currency: string;
   stripe_payment_link: string | null;
@@ -41,6 +44,9 @@ interface ProductRow {
   category: string | null;
   audience_market: string | null;
   image_url: string | null;
+  shop_thumbnail_url: string | null;
+  gallery_image_urls: string[] | null;
+  sample_pdf_url: string | null;
   price_cents: number | null;
   currency: string | null;
   stripe_payment_link: string | null;
@@ -67,7 +73,7 @@ interface ProductAssetRow {
 }
 
 const PRODUCT_SELECT =
-  "id, title, slug, description, long_description, category, audience_market, image_url, price_cents, currency, stripe_payment_link, featured, published, order_index, grants_guide_access, access_scope, tags, updated_at, created_at";
+  "id, title, slug, description, long_description, category, audience_market, image_url, shop_thumbnail_url, gallery_image_urls, sample_pdf_url, price_cents, currency, stripe_payment_link, featured, published, order_index, grants_guide_access, access_scope, tags, updated_at, created_at";
 
 const assertSupabase = () => {
   if (!supabase) {
@@ -85,6 +91,9 @@ const toProduct = (row: ProductRow): Product => ({
   category: row.category,
   audience_market: row.audience_market,
   image_url: row.image_url,
+  shop_thumbnail_url: row.shop_thumbnail_url,
+  gallery_image_urls: row.gallery_image_urls ?? [],
+  sample_pdf_url: row.sample_pdf_url,
   price_cents: Number(row.price_cents ?? 0),
   currency: row.currency ?? "usd",
   stripe_payment_link: row.stripe_payment_link,
@@ -146,6 +155,9 @@ export const saveAdminProduct = async (input: AdminProductInput): Promise<void> 
     category: input.category,
     audience_market: input.audience_market,
     image_url: input.image_url,
+    shop_thumbnail_url: input.shop_thumbnail_url,
+    gallery_image_urls: input.gallery_image_urls,
+    sample_pdf_url: input.sample_pdf_url,
     price_cents: input.price_cents,
     currency: input.currency || "usd",
     stripe_payment_link: input.stripe_payment_link,
@@ -194,6 +206,9 @@ export const duplicateAdminProduct = async (id: string): Promise<void> => {
       category: source.category,
       audience_market: source.audience_market,
       image_url: source.image_url,
+      shop_thumbnail_url: source.shop_thumbnail_url,
+      gallery_image_urls: source.gallery_image_urls,
+      sample_pdf_url: source.sample_pdf_url,
       price_cents: source.price_cents,
       currency: source.currency,
       stripe_payment_link: source.stripe_payment_link,

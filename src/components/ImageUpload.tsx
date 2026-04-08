@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Eye, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { uploadToPublicBucket } from "@/lib/media";
@@ -30,6 +31,7 @@ export function ImageUpload({
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,14 +98,35 @@ export function ImageUpload({
       )}
 
       {value && (
-        <div className="overflow-hidden rounded-md border bg-muted">
-          <img
-            src={value}
-            alt="Preview"
-            className="aspect-[16/9] w-full object-cover"
-          />
+        <div className="flex items-center gap-2 rounded-md border bg-muted/40 p-2">
+          <div className="h-14 w-20 overflow-hidden rounded border bg-muted">
+            <img src={value} alt="Preview" className="h-full w-full object-cover" />
+          </div>
+          <div className="flex items-center gap-1">
+            <Button type="button" size="sm" variant="outline" onClick={() => setIsLightboxOpen(true)}>
+              <Eye className="mr-1 h-3.5 w-3.5" />
+              View
+            </Button>
+            <Button type="button" size="sm" variant="outline" onClick={() => onChange("")}>
+              <Trash2 className="mr-1 h-3.5 w-3.5" />
+              Delete
+            </Button>
+          </div>
         </div>
       )}
+
+      <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
+        <DialogContent className="max-w-3xl p-0">
+          <DialogHeader className="px-4 pt-4">
+            <DialogTitle>{label}</DialogTitle>
+          </DialogHeader>
+          {value && (
+            <div className="px-4 pb-4">
+              <img src={value} alt={label} className="max-h-[70vh] w-full rounded-md object-contain" />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -20,7 +20,6 @@ import {
 } from "@/lib/admin-guides";
 import { GUIDE_AUDIENCE_OPTIONS, GUIDE_CATEGORY_OPTIONS, GUIDE_LEVEL_OPTIONS } from "@/lib/guide-options";
 import { ImageUpload } from "@/components/ImageUpload";
-import { getVersionedMediaUrl } from "@/lib/media";
 import { adminEmailAllowlist } from "@/lib/supabase";
 
 interface GuideFormState {
@@ -315,15 +314,6 @@ export default function AdminGuideEditorPage() {
             value={form.cover_image || null}
             onChange={(url) => setForm((prev) => ({ ...prev, cover_image: url }))}
           />
-          {form.cover_image && (
-            <div className="-mt-1 overflow-hidden rounded-md border bg-muted">
-              <img
-                src={getVersionedMediaUrl(form.cover_image, guideData?.updated_at ?? new Date().toISOString())}
-                alt={form.title || "Guide cover preview"}
-                className="aspect-[16/9] w-full object-cover"
-              />
-            </div>
-          )}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="flex items-center gap-2 text-sm">

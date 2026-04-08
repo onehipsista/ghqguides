@@ -81,6 +81,15 @@ export default function GuidesPage() {
         </div>
       </section>
 
+      <section className="border-b bg-background">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <p className="text-lg leading-relaxed text-foreground/85 sm:text-xl">
+            MicroGuides deliver clear, useful information you can apply quickly. No degree required. Short reads on
+            graphic design, marketing, and nonprofit communications. Practical insights you can use right away.
+          </p>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {isLoading && (
           <div className="py-16 text-center text-muted-foreground">Loading guides...</div>

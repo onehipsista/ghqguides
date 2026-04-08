@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
@@ -9,12 +10,30 @@ import { formatProductPrice, getPublicProductBySlug } from "@/lib/products";
 export default function ShopProductPage() {
   const params = useParams();
   const productSlug = params.slug ?? "";
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ["public-product", productSlug],
     queryFn: () => getPublicProductBySlug(productSlug),
     enabled: Boolean(productSlug),
   });
+
+  const productImages = useMemo(() => {
+    if (!product) return [];
+
+    const unique = new Set<string>();
+    [product.image_url, ...(product.gallery_image_urls ?? [])]
+      .filter(Boolean)
+      .forEach((url) => {
+        if (url) unique.add(url);
+      });
+
+    return Array.from(unique);
+  }, [product]);
+
+  useEffect(() => {
+    setSelectedImage(productImages[0] ?? null);
+  }, [productImages]);
 
   if (!productSlug) {
     return <Navigate to="/shop" replace />;
@@ -45,17 +64,36 @@ export default function ShopProductPage() {
         )}
 
         {product && (
-          <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
             <div>
               <div className="overflow-hidden rounded-xl border bg-card">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.title} className="aspect-[4/5] w-full object-cover" />
+                {selectedImage ? (
+                  <img src={selectedImage} alt={product.title} className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]" />
                 ) : (
-                  <div className="flex aspect-[4/5] w-full items-center justify-center bg-muted text-sm text-muted-foreground">
+                  <div className="flex aspect-[4/3] w-full items-center justify-center bg-muted text-sm text-muted-foreground lg:aspect-[4/5]">
                     No image
                   </div>
                 )}
               </div>
+
+              {productImages.length > 1 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {productImages.map((imageUrl, index) => (
+                    <button
+                      key={imageUrl}
+                      type="button"
+                      onClick={() => setSelectedImage(imageUrl)}
+                      className={`h-14 w-20 overflow-hidden rounded-md border bg-muted transition-colors ${
+                        selectedImage === imageUrl ? "border-brand-green" : "border-border"
+                      }`}
+                      aria-label={`View product image ${index + 1}`}
+                    >
+                      <img src={imageUrl} alt={`${product.title} ${index + 1}`} className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {product.grants_guide_access && (
                 <p className="mt-4 text-xs text-muted-foreground">
                   This product includes access to the full{" "}
@@ -85,6 +123,20 @@ export default function ShopProductPage() {
               {product.long_description && (
                 <div className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
                   {product.long_description}
+                </div>
+              )}
+
+              {product.sample_pdf_url && (
+                <div className="mt-4 rounded-md border bg-muted/30 p-3">
+                  <p className="text-xs text-muted-foreground">Preview before you buy</p>
+                  <a
+                    href={product.sample_pdf_url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="mt-1 inline-flex text-sm font-medium text-brand-green hover:underline"
+                  >
+                    Open sample PDF
+                  </a>
                 </div>
               )}
 

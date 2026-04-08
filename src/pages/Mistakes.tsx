@@ -132,6 +132,17 @@ export default function MistakesPage() {
         </div>
       </section>
 
+      <section className="border-b bg-background">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <p className="text-lg leading-relaxed text-foreground/85 sm:text-xl">
+            You don't know what you don't know when you're starting out. Most design mistakes aren't about talent.
+            They're about experience. After reviewing real designs through my Design Check service, the same issues
+            kept showing up. So I started documenting them. Browse the growing collection and get recommendations on
+            what to fix.
+          </p>
+        </div>
+      </section>
+
       {/* Filters */}
       <section className="border-b bg-card">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">

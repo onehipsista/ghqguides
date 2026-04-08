@@ -129,8 +129,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-8 text-xs text-nav-foreground/40 sm:flex-row sm:items-center sm:justify-between">
-          <p>
+        <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-8 text-xs sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-nav-foreground/30">
             © {new Date().getFullYear()} OneHipSista LLC. All rights reserved.
           </p>
           <div className="flex items-center gap-8">
@@ -140,7 +140,7 @@ export function Footer() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-colors hover:text-brand-green"
+                className="text-nav-foreground/40 transition-colors hover:text-brand-green"
               >
                 {link.label}
               </a>

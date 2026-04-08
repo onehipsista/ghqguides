@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ImageUpload";
@@ -8,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getAccessState } from "@/lib/access";
+import { uploadToPublicBucket } from "@/lib/media";
 import {
   deleteAdminProductAsset,
   getAdminProductAssets,
@@ -25,6 +27,9 @@ interface ProductFormState {
   category: string;
   audience_market: string;
   image_url: string;
+  shop_thumbnail_url: string;
+  gallery_image_urls: string[];
+  sample_pdf_url: string;
   price_dollars: string;
   currency: string;
   stripe_payment_link: string;
@@ -44,6 +49,9 @@ const DEFAULT_STATE: ProductFormState = {
   category: "PDF Guide",
   audience_market: "",
   image_url: "",
+  shop_thumbnail_url: "",
+  gallery_image_urls: [],
+  sample_pdf_url: "",
   price_dollars: "",
   currency: "usd",
   stripe_payment_link: "",
@@ -73,6 +81,8 @@ export default function AdminProductEditorPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [assetTitle, setAssetTitle] = useState("");
   const [assetPath, setAssetPath] = useState("");
+  const [isUploadingSamplePdf, setIsUploadingSamplePdf] = useState(false);
+  const [samplePdfUploadError, setSamplePdfUploadError] = useState("");
 
   const { data: accessState, isLoading: isAccessLoading } = useQuery({
     queryKey: ["access-state"],
@@ -107,6 +117,9 @@ export default function AdminProductEditorPage() {
       category: productData.category ?? "",
       audience_market: productData.audience_market ?? "",
       image_url: productData.image_url ?? "",
+      shop_thumbnail_url: productData.shop_thumbnail_url ?? "",
+      gallery_image_urls: productData.gallery_image_urls ?? [],
+      sample_pdf_url: productData.sample_pdf_url ?? "",
       price_dollars: String((productData.price_cents || 0) / 100),
       currency: productData.currency,
       stripe_payment_link: productData.stripe_payment_link ?? "",
@@ -136,6 +149,9 @@ export default function AdminProductEditorPage() {
         category: form.category.trim() || null,
         audience_market: form.audience_market.trim() || null,
         image_url: form.image_url.trim() || null,
+        shop_thumbnail_url: form.shop_thumbnail_url.trim() || null,
+        gallery_image_urls: form.gallery_image_urls.map((url) => url.trim()).filter(Boolean),
+        sample_pdf_url: form.sample_pdf_url.trim() || null,
         price_cents: parsedPriceCents,
         currency: form.currency.trim().toLowerCase() || "usd",
         stripe_payment_link: form.stripe_payment_link.trim() || null,
@@ -202,6 +218,24 @@ export default function AdminProductEditorPage() {
 
     setForm((prev) => ({ ...prev, slug: nextSlug }));
     saveProduct();
+  };
+
+  const handleSamplePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setSamplePdfUploadError("");
+    setIsUploadingSamplePdf(true);
+
+    try {
+      const url = await uploadToPublicBucket(file, "guide-media", "product-samples");
+      setForm((prev) => ({ ...prev, sample_pdf_url: url }));
+    } catch (error) {
+      setSamplePdfUploadError(error instanceof Error ? error.message : "PDF upload failed.");
+    } finally {
+      setIsUploadingSamplePdf(false);
+      event.target.value = "";
+    }
   };
 
   if (!isAccessLoading && !isAdmin) {
@@ -290,10 +324,116 @@ export default function AdminProductEditorPage() {
           </div>
 
           <ImageUpload
-            label="Product Image"
+            label="Product Main Image (Detail Page)"
             value={form.image_url || null}
             onChange={(url) => setForm((prev) => ({ ...prev, image_url: url }))}
           />
+
+          <ImageUpload
+            label="Shop Thumbnail (4:3 for /shop cards)"
+            value={form.shop_thumbnail_url || null}
+            onChange={(url) => setForm((prev) => ({ ...prev, shop_thumbnail_url: url }))}
+          />
+
+          <div className="space-y-3 rounded-lg border border-dashed p-4">
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">Alternative Product Photos</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Add optional images. On the product page, clicking a thumbnail will swap the main image.
+              </p>
+            </div>
+
+            {form.gallery_image_urls.length === 0 && (
+              <p className="text-xs text-muted-foreground">No alternative photos added yet.</p>
+            )}
+
+            <div className="space-y-3">
+              {form.gallery_image_urls.map((url, index) => (
+                <div key={`gallery-${index}`} className="rounded-md border p-3">
+                  <ImageUpload
+                    label={`Alternative Photo ${index + 1}`}
+                    value={url || null}
+                    onChange={(nextUrl) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        gallery_image_urls: prev.gallery_image_urls.map((item, itemIndex) =>
+                          itemIndex === index ? nextUrl : item
+                        ),
+                      }))
+                    }
+                  />
+                  <div className="mt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          gallery_image_urls: prev.gallery_image_urls.filter((_, itemIndex) => itemIndex !== index),
+                        }))
+                      }
+                    >
+                      Remove Photo
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                setForm((prev) => ({
+                  ...prev,
+                  gallery_image_urls: [...prev.gallery_image_urls, ""],
+                }))
+              }
+            >
+              Add Alternative Photo
+            </Button>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="sample_pdf_url">Sample PDF URL (optional)</Label>
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                id="sample_pdf_url"
+                value={form.sample_pdf_url}
+                onChange={(event) => setForm((prev) => ({ ...prev, sample_pdf_url: event.target.value }))}
+                placeholder="https://.../sample.pdf"
+                className="flex-1"
+              />
+              <Button type="button" variant="outline" className="relative" disabled={isUploadingSamplePdf}>
+                {isUploadingSamplePdf ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Uploading…
+                  </>
+                ) : (
+                  "Upload PDF"
+                )}
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                  disabled={isUploadingSamplePdf}
+                  onChange={handleSamplePdfUpload}
+                />
+              </Button>
+              {form.sample_pdf_url && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setForm((prev) => ({ ...prev, sample_pdf_url: "" }))}
+                >
+                  Remove PDF
+                </Button>
+              )}
+            </div>
+            {samplePdfUploadError && <p className="text-xs text-red-600">{samplePdfUploadError}</p>}
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="stripe_link">Stripe Payment Link</Label>

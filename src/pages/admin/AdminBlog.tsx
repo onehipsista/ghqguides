@@ -131,8 +131,17 @@ export default function AdminBlogPage() {
                             })
                           }
                         >
-                          {post.status === "published" ? <OctagonMinus className="mr-1 h-3.5 w-3.5" /> : <Upload className="mr-1 h-3.5 w-3.5" />}
-                          {post.status === "published" ? "Unpublish" : "Publish"}
+                          {post.status === "published" ? (
+                            <>
+                              <OctagonMinus className="h-3.5 w-3.5" />
+                              <span className="sr-only">Unpublish</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="mr-1 h-3.5 w-3.5" />
+                              Publish
+                            </>
+                          )}
                         </Button>
                         <Link to={`/admin/blog/${post.id}`}>
                           <Button size="sm" variant="outline" aria-label="Edit post" title="Edit">

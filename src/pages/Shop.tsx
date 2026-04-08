@@ -91,9 +91,9 @@ export default function ShopPage() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filteredProducts.map((product) => (
             <article key={product.id} className="overflow-hidden rounded-xl border bg-card">
-              <Link to={`/shop/${product.slug}`} className="block aspect-[16/9] w-full bg-muted">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.title} className="h-full w-full object-cover" loading="lazy" />
+              <Link to={`/shop/${product.slug}`} className="block aspect-[4/3] w-full bg-muted">
+                {(product.shop_thumbnail_url || product.image_url) ? (
+                  <img src={product.shop_thumbnail_url || product.image_url || ""} alt={product.title} className="h-full w-full object-cover" loading="lazy" />
                 ) : (
                   <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No image</div>
                 )}

@@ -248,8 +248,17 @@ export default function AdminMistakesPage() {
                               })
                             }
                           >
-                            {issue.published ? <OctagonMinus className="mr-1 h-3.5 w-3.5" /> : <Upload className="mr-1 h-3.5 w-3.5" />}
-                            {issue.published ? "Unpublish" : "Publish"}
+                            {issue.published ? (
+                              <>
+                                <OctagonMinus className="h-3.5 w-3.5" />
+                                <span className="sr-only">Unpublish</span>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="mr-1 h-3.5 w-3.5" />
+                                Publish
+                              </>
+                            )}
                           </Button>
                         </div>
                       </td>
