@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { SimpleRichTextEditor } from "@/components/SimpleRichTextEditor";
 
 interface MarkdownLiteEditorProps {
   value: string;
@@ -10,40 +9,6 @@ interface MarkdownLiteEditorProps {
 const looksLikeHtml = (input: string) => /<\/?[a-z][\s\S]*>/i.test(input);
 
 export function MarkdownLiteEditor({ value, onChange }: MarkdownLiteEditorProps) {
-  const modules = useMemo(
-    () => ({
-      toolbar: [
-        [{ header: [1, 2, 3, false] }],
-        ["bold", "italic", "underline", "strike"],
-        [{ list: "ordered" }, { list: "bullet" }],
-        ["blockquote", "code-block"],
-        ["link", "image"],
-        [{ color: [] }, { background: [] }],
-        ["clean"],
-      ],
-    }),
-    []
-  );
-
-  const formats = useMemo(
-    () => [
-      "header",
-      "bold",
-      "italic",
-      "underline",
-      "strike",
-      "list",
-      "bullet",
-      "blockquote",
-      "code-block",
-      "link",
-      "image",
-      "color",
-      "background",
-    ],
-    []
-  );
-
   const normalizedValue = useMemo(() => {
     if (!value) return "";
     if (looksLikeHtml(value)) return value;
@@ -63,13 +28,7 @@ export function MarkdownLiteEditor({ value, onChange }: MarkdownLiteEditorProps)
 
   return (
     <div className="markdown-lite-editor rounded-lg border bg-card">
-      <ReactQuill
-        theme="snow"
-        value={normalizedValue}
-        onChange={(nextValue) => onChange(nextValue ?? "")}
-        modules={modules}
-        formats={formats}
-      />
+      <SimpleRichTextEditor value={normalizedValue} onChange={(nextValue) => onChange(nextValue ?? "")} />
     </div>
   );
 }
