@@ -31,6 +31,7 @@ interface PostFormState {
   cover_image: string;
   author: string;
   category: string;
+  extra_categories_csv: string;
   tags_csv: string;
   status: "draft" | "published";
   reading_time_minutes: string;
@@ -48,12 +49,21 @@ const DEFAULT_STATE: PostFormState = {
   cover_image: "",
   author: "OneHipSista",
   category: BLOG_CATEGORY_DEFAULT,
+  extra_categories_csv: "",
   tags_csv: "",
   status: "draft",
   reading_time_minutes: "1",
   reading_time_mode: "auto",
   published_at: "",
   order_index: "0",
+};
+
+const splitStoredCategories = (value: string | null | undefined): string[] => {
+  if (!value) return [];
+  return value
+    .split(/[|,]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 };
 
 export default function AdminPostEditorPage() {
@@ -83,6 +93,7 @@ export default function AdminPostEditorPage() {
 
   useEffect(() => {
     if (!postData) return;
+    const categories = splitStoredCategories(postData.category);
     setForm({
       title: postData.title,
       slug: postData.slug,
@@ -91,7 +102,8 @@ export default function AdminPostEditorPage() {
       content: postData.content,
       cover_image: postData.cover_image ?? "",
       author: postData.author ?? "OneHipSista",
-      category: postData.category ?? BLOG_CATEGORY_DEFAULT,
+      category: categories[0] ?? BLOG_CATEGORY_DEFAULT,
+      extra_categories_csv: categories.slice(1).join(", "),
       tags_csv: postData.tags.join(", "),
       status: postData.status,
       reading_time_minutes: String(postData.reading_time_minutes ?? 1),
@@ -112,8 +124,15 @@ export default function AdminPostEditorPage() {
       : Math.max(1, Number(form.reading_time_minutes || 1));
 
   const { mutate: save, isPending: isSaving } = useMutation({
-    mutationFn: () =>
-      saveAdminPost({
+    mutationFn: () => {
+      const extraCategories = form.extra_categories_csv
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+
+      const combinedCategories = Array.from(new Set([form.category.trim(), ...extraCategories].filter(Boolean)));
+
+      return saveAdminPost({
         id,
         title: form.title.trim(),
         slug: form.slug.trim(),
@@ -122,7 +141,7 @@ export default function AdminPostEditorPage() {
         content: form.content.trim(),
         cover_image: form.cover_image.trim() || null,
         author: form.author.trim() || null,
-        category: form.category.trim() || null,
+        category: combinedCategories.length > 0 ? combinedCategories.join(" | ") : null,
         tags: form.tags_csv
           .split(",")
           .map((t) => t.trim())
@@ -131,7 +150,8 @@ export default function AdminPostEditorPage() {
         reading_time_minutes: effectiveReadingTime,
         published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
         order_index: Number(form.order_index || 0),
-      }),
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-posts"] });
       queryClient.invalidateQueries({ queryKey: ["public-posts"] });
@@ -240,6 +260,16 @@ export default function AdminPostEditorPage() {
               </select>
             </div>
             <div className="space-y-2">
+              <Label htmlFor="extra_categories">Additional Categories</Label>
+              <Input
+                id="extra_categories"
+                placeholder="Optional, comma separated"
+                value={form.extra_categories_csv}
+                onChange={(e) => setForm((prev) => ({ ...prev, extra_categories_csv: e.target.value }))}
+              />
+              <p className="text-xs text-muted-foreground">Example: Marketing, AI</p>
+            </div>
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="author">Author</Label>
               <Input
                 id="author"

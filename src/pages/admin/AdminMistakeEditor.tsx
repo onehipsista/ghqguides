@@ -126,7 +126,7 @@ export default function AdminMistakeEditorPage() {
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
             <h1 className="font-display text-2xl font-bold text-foreground">
-              {isEditing ? "Edit Design Issue" : "New Design Issue"}
+              {isEditing ? "Edit Design Mistake" : "New Design Mistake"}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
               {isEditing

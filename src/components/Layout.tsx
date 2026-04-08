@@ -15,7 +15,7 @@ export function Layout({ children }: LayoutProps) {
     <div className="flex min-h-screen flex-col">
       <Navbar />
       {isAdmin && <AdminNav />}
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-300">{children}</main>
       <Footer />
     </div>
   );

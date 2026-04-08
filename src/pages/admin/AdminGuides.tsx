@@ -94,12 +94,12 @@ export default function AdminGuidesPage() {
   return (
     <Layout>
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="font-display text-2xl font-bold text-foreground">Admin — Guides</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Create and manage guide metadata and visibility.</p>
+        <h1 className="font-display text-2xl font-bold text-foreground">Admin — MicroGuides</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Create and manage MicroGuide metadata and visibility.</p>
 
         <div className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-md border bg-card p-1">
           <Link to="/admin/guides">
-            <Button size="sm" variant="outline">Guides</Button>
+            <Button size="sm" variant="outline">MicroGuides</Button>
           </Link>
           <Link to="/admin/articles/new">
             <Button size="sm" variant="outline">Articles</Button>
@@ -111,7 +111,7 @@ export default function AdminGuidesPage() {
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Link to="/admin/guides/new">
-            <Button>Add New Guide</Button>
+            <Button>Add New MicroGuide</Button>
           </Link>
 
           <select

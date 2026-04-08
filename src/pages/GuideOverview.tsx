@@ -14,9 +14,18 @@ import {
 } from "@/components/ui/breadcrumb";
 import { getGuideOverviewBySlug } from "@/lib/guides";
 
+const decodeParam = (value: string | undefined): string => {
+  if (!value) return "";
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 export default function GuideOverviewPage() {
   const params = useParams();
-  const slug = params.slug ?? "";
+  const slug = decodeParam(params.slug);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["guide-overview", slug],
@@ -72,7 +81,7 @@ export default function GuideOverviewPage() {
       <section className="sticky top-16 z-40 border-b bg-brand-green">
         <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
           <Link to="/guides" className="text-xs font-medium text-white hover:underline">
-            ← Guide Library
+            ← MicroGuides
           </Link>
         </div>
       </section>
@@ -83,7 +92,7 @@ export default function GuideOverviewPage() {
             <BreadcrumbList className="text-xs">
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link to="/guides">Guide Library</Link>
+                  <Link to="/guides">MicroGuides</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
@@ -109,7 +118,7 @@ export default function GuideOverviewPage() {
             <h1 className="font-display text-2xl font-semibold text-foreground">Guide not found</h1>
             <p className="mt-2 text-muted-foreground">This guide may be unpublished or unavailable.</p>
             <Link to="/guides" className="mt-4 inline-block text-sm font-medium text-brand-green hover:underline">
-              Back to Guide Library
+              Back to MicroGuides
             </Link>
           </div>
         )}
@@ -240,6 +249,15 @@ export default function GuideOverviewPage() {
             </aside>
 
             <div className="order-1 lg:order-2">
+              {guide.overview_banner_image && (
+                <div className="mb-5 overflow-hidden rounded-xl border bg-card">
+                  <img
+                    src={guide.overview_banner_image}
+                    alt={`${guide.title} overview banner`}
+                    className="aspect-[16/5] w-full object-cover"
+                  />
+                </div>
+              )}
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand-green">
                 {guide.category ?? "General"}
               </p>

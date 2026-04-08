@@ -27,6 +27,7 @@ interface GuideFormState {
   slug: string;
   description: string;
   cover_image: string;
+  overview_banner_image: string;
   category: string;
   audience_market: string;
   level: string;
@@ -40,6 +41,7 @@ const DEFAULT_STATE: GuideFormState = {
   slug: "",
   description: "",
   cover_image: "",
+  overview_banner_image: "",
   category: GUIDE_CATEGORY_OPTIONS[0],
   audience_market: GUIDE_AUDIENCE_OPTIONS[0],
   level: GUIDE_LEVEL_OPTIONS[0],
@@ -55,6 +57,16 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+
+const DEFAULT_SECTION_TITLES = [
+  "Overview",
+  "Getting Started",
+  "What to Know",
+  "Best Practices",
+  "HipTips",
+  "Wrap Up",
+  "Conclusion",
+];
 
 export default function AdminGuideEditorPage() {
   const { id } = useParams();
@@ -103,6 +115,7 @@ export default function AdminGuideEditorPage() {
       slug: guideData.slug,
       description: guideData.description,
       cover_image: guideData.cover_image ?? "",
+      overview_banner_image: guideData.overview_banner_image ?? "",
       category: guideData.category ?? GUIDE_CATEGORY_OPTIONS[0],
       audience_market: guideData.audience_market ?? GUIDE_AUDIENCE_OPTIONS[0],
       level: guideData.level ?? GUIDE_LEVEL_OPTIONS[0],
@@ -122,6 +135,7 @@ export default function AdminGuideEditorPage() {
         slug: form.slug.trim(),
         description: form.description.trim(),
         cover_image: form.cover_image.trim() || null,
+        overview_banner_image: form.overview_banner_image.trim() || null,
         category: form.category.trim() || null,
         audience_market: form.audience_market.trim() || null,
         level: form.level.trim() || null,
@@ -144,6 +158,19 @@ export default function AdminGuideEditorPage() {
     mutationFn: () => addGuideSection(id as string, newSectionTitle.trim()),
     onSuccess: () => {
       setNewSectionTitle("");
+      queryClient.invalidateQueries({ queryKey: ["admin-guide-sections", id] });
+    },
+  });
+
+  const { mutate: addDefaultSections, isPending: isAddingDefaultSections } = useMutation({
+    mutationFn: async () => {
+      const existing = new Set(sections.map((section) => section.title.trim().toLowerCase()));
+      for (const sectionTitle of DEFAULT_SECTION_TITLES) {
+        if (existing.has(sectionTitle.toLowerCase())) continue;
+        await addGuideSection(id as string, sectionTitle);
+      }
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-guide-sections", id] });
     },
   });
@@ -201,7 +228,7 @@ export default function AdminGuideEditorPage() {
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
             <h1 className="font-display text-2xl font-bold text-foreground">
-              {isEditing ? "Edit Guide" : "New Guide"}
+              {isEditing ? "Edit MicroGuide" : "New MicroGuide"}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
               {isEditing ? "Update guide details and manage structure." : "Create a new guide."}
@@ -315,6 +342,12 @@ export default function AdminGuideEditorPage() {
             onChange={(url) => setForm((prev) => ({ ...prev, cover_image: url }))}
           />
 
+          <ImageUpload
+            label="Overview Banner Image (short)"
+            value={form.overview_banner_image || null}
+            onChange={(url) => setForm((prev) => ({ ...prev, overview_banner_image: url }))}
+          />
+
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -388,6 +421,32 @@ export default function AdminGuideEditorPage() {
                 </Button>
               </div>
 
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isAddingDefaultSections}
+                  onClick={() => addDefaultSections()}
+                >
+                  Add Default Flow
+                </Button>
+                {DEFAULT_SECTION_TITLES.map((sectionTitle) => (
+                  <Button
+                    key={sectionTitle}
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={isAddingSection || isAddingDefaultSections}
+                    onClick={() => {
+                      setNewSectionTitle(sectionTitle);
+                    }}
+                  >
+                    {sectionTitle}
+                  </Button>
+                ))}
+              </div>
+
               <ul className="mt-4 space-y-2">
                 {sections.length === 0 ? (
                   <li className="text-sm text-muted-foreground">No sections yet.</li>
@@ -448,7 +507,11 @@ export default function AdminGuideEditorPage() {
                         <div>
                           <p className="text-sm font-medium text-foreground">{article.title}</p>
                           <p className="text-xs text-muted-foreground">
-                            {article.section_id ? sectionMap.get(article.section_id) ?? "Unknown section" : "No section"}
+                            {article.section_id ? (
+                              sectionMap.get(article.section_id) ?? "Unknown section"
+                            ) : (
+                              <span className="font-medium text-red-600">No section</span>
+                            )}
                             {" • "}
                             {article.published ? "Published" : "Draft"}
                           </p>

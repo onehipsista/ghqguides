@@ -5,12 +5,14 @@ import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { formatProductPrice, getPublicProductBySlug } from "@/lib/products";
 
 export default function ShopProductPage() {
   const params = useParams();
   const productSlug = params.slug ?? "";
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ["public-product", productSlug],
@@ -43,14 +45,14 @@ export default function ShopProductPage() {
     <Layout>
       <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <Link to="/shop" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back to shop
+          <ArrowLeft className="h-4 w-4" /> Back to Resource Shop
         </Link>
 
         {isLoading && <div className="py-16 text-center text-muted-foreground">Loading product...</div>}
 
         {isError && (
           <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-            We couldn't load this product right now.
+            We couldn't load this product.
           </div>
         )}
 
@@ -58,7 +60,7 @@ export default function ShopProductPage() {
           <div className="py-16 text-center">
             <h1 className="font-display text-2xl font-semibold text-foreground">Product not found</h1>
             <Link to="/shop" className="mt-4 inline-block text-sm font-medium text-brand-green hover:underline">
-              Return to shop
+              Return to Resource Shop
             </Link>
           </div>
         )}
@@ -68,7 +70,9 @@ export default function ShopProductPage() {
             <div>
               <div className="overflow-hidden rounded-xl border bg-card">
                 {selectedImage ? (
-                  <img src={selectedImage} alt={product.title} className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]" />
+                  <button type="button" className="block w-full" onClick={() => setLightboxImage(selectedImage)}>
+                    <img src={selectedImage} alt={product.title} className="aspect-[4/3] w-full object-cover lg:aspect-[4/5]" />
+                  </button>
                 ) : (
                   <div className="flex aspect-[4/3] w-full items-center justify-center bg-muted text-sm text-muted-foreground lg:aspect-[4/5]">
                     No image
@@ -82,7 +86,10 @@ export default function ShopProductPage() {
                     <button
                       key={imageUrl}
                       type="button"
-                      onClick={() => setSelectedImage(imageUrl)}
+                      onClick={() => {
+                        setSelectedImage(imageUrl);
+                        setLightboxImage(imageUrl);
+                      }}
                       className={`h-14 w-20 overflow-hidden rounded-md border bg-muted transition-colors ${
                         selectedImage === imageUrl ? "border-brand-green" : "border-border"
                       }`}
@@ -98,7 +105,7 @@ export default function ShopProductPage() {
                 <p className="mt-4 text-xs text-muted-foreground">
                   This product includes access to the full{" "}
                   <Link to="/guides" className="text-brand-green hover:underline">
-                    Guide Library
+                    MicroGuides
                   </Link>
                   {" "}and{" "}
                   <Link to="/mistakes" className="text-brand-green hover:underline">
@@ -113,7 +120,7 @@ export default function ShopProductPage() {
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge variant="secondary">{product.category ?? "Resource"}</Badge>
               {product.grants_guide_access && (
-                <Badge className="bg-brand-green text-white hover:bg-brand-green">Includes Guide Access</Badge>
+                <Badge className="bg-brand-green text-white hover:bg-brand-green">Includes MicroGuides Access</Badge>
               )}
               </div>
 
@@ -128,14 +135,14 @@ export default function ShopProductPage() {
 
               {product.sample_pdf_url && (
                 <div className="mt-4 rounded-md border bg-muted/30 p-3">
-                  <p className="text-xs text-muted-foreground">Preview before you buy</p>
+                  <p className="text-xs text-muted-foreground">Sample Before You Buy</p>
                   <a
                     href={product.sample_pdf_url}
                     target="_blank"
                     rel="noreferrer noopener"
                     className="mt-1 inline-flex text-sm font-medium text-brand-green hover:underline"
                   >
-                    Open sample PDF
+                    Open Sample PDF
                   </a>
                 </div>
               )}
@@ -168,12 +175,20 @@ export default function ShopProductPage() {
 
               {product.grants_guide_access && (
                 <p className="mt-3 text-xs text-muted-foreground">
-                  This product includes access to the full Guide Library and Design Mistakes content.
+                  This product includes access to the full MicroGuides Library and Design Mistakes content.
                 </p>
               )}
             </article>
           </div>
         )}
+
+        <Dialog open={Boolean(lightboxImage)} onOpenChange={(open) => !open && setLightboxImage(null)}>
+          <DialogContent className="max-w-5xl p-0">
+            {lightboxImage && (
+              <img src={lightboxImage} alt={product?.title ?? "Product image"} className="max-h-[85vh] w-full object-contain" />
+            )}
+          </DialogContent>
+        </Dialog>
       </section>
     </Layout>
   );

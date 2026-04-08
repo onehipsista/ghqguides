@@ -6,5 +6,8 @@
 		{
 			"path": "../base44-reference"
 		}
-	]
+	],
+	"settings": {
+		"chat.agent.maxRequests": 40
+	}
 }

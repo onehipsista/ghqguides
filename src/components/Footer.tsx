@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
-import { Instagram, Linkedin, Mail } from "lucide-react";
+import { Instagram, Linkedin, Mail, SquareArrowOutUpRight } from "lucide-react";
 
 const quickLinks = [
   { label: "Design Mistakes", href: "/mistakes", external: false },
-  { label: "Guide Library", href: "/guides", external: false },
+  { label: "MicroGuides", href: "/guides", external: false },
   { label: "Design Check", href: "https://app.gethipquick.com", external: true },
 ];
 
 const resourceLinks = [
-  { label: "Shop Resources", href: "#" },
-  { label: "Blog", href: "/blog" },
+  { label: "Resource Shop", href: "/shop" },
+  { label: "What's Hip", href: "/blog" },
   { label: "HipTips", href: "#" },
 ];
 
@@ -41,7 +41,7 @@ export function Footer() {
               />
             </a>
             <p className="mt-4 text-sm leading-relaxed text-nav-foreground/60">
-              Check out the growing library of articles, microguides, and checklists. Get Hip. Stay Hip.
+              Check out the growing library of articles, MicroGuides, and checklists. Get Hip. Stay Hip.
             </p>
           </div>
 
@@ -58,14 +58,15 @@ export function Footer() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-nav-foreground/70 transition-colors hover:text-brand-green"
+                      className="inline-flex items-center gap-1 text-sm text-nav-foreground/30 transition-colors hover:text-brand-green"
                     >
                       {link.label}
+                      <SquareArrowOutUpRight className="h-3.5 w-3.5" />
                     </a>
                   ) : (
                     <Link
                       to={link.href}
-                      className="text-sm text-nav-foreground/70 transition-colors hover:text-brand-green"
+                      className="text-sm text-nav-foreground/30 transition-colors hover:text-brand-green"
                     >
                       {link.label}
                     </Link>
@@ -100,7 +101,7 @@ export function Footer() {
               Connect
             </h3>
             <p className="mt-5 text-sm leading-relaxed text-nav-foreground/70">
-              Questions? Reach out at{" "}
+              Say hi.{" "}
               <a
                 href="mailto:hello@gethipquick.com"
                 className="text-brand-green hover:underline"
@@ -131,7 +132,7 @@ export function Footer() {
 
         <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-8 text-xs sm:flex-row sm:items-center sm:justify-between">
           <p className="text-nav-foreground/30">
-            © {new Date().getFullYear()} OneHipSista LLC. All rights reserved.
+            © {new Date().getFullYear()} <a href="mailto:onehipsista@gethipquick.com" className="transition-colors hover:text-brand-green">OneHipSista</a> LLC. GetHipQuick. All rights reserved.
           </p>
           <div className="flex items-center gap-8">
             {legalLinks.map((link) => (

@@ -13,6 +13,7 @@ interface GuideRow {
   slug: string;
   description: string | null;
   cover_image: string | null;
+  overview_banner_image: string | null;
   order_index?: number | null;
   category: string | null;
   audience_market?: string | null;
@@ -46,9 +47,9 @@ interface ArticleRow {
 }
 
 const GUIDE_SELECT_V3 =
-  "id, title, slug, description, cover_image, order_index, category, audience_market, level, material_symbol, featured, published, updated_at";
+  "id, title, slug, description, cover_image, overview_banner_image, order_index, category, audience_market, level, material_symbol, featured, published, updated_at";
 const GUIDE_SELECT_V2 =
-  "id, title, slug, description, cover_image, category, audience_market, level, material_symbol, featured, published, updated_at";
+  "id, title, slug, description, cover_image, overview_banner_image, category, audience_market, level, material_symbol, featured, published, updated_at";
 const GUIDE_SELECT_V1 = "id, title, slug, description, cover_image, category, featured, published, updated_at";
 
 const ARTICLE_SELECT_V2 =
@@ -57,12 +58,95 @@ const ARTICLE_SELECT_V1 = "id, guide_id, section_id, title, slug, content, order
 
 const mockGuides: Guide[] = [];
 
+const safeDecode = (value: string): string => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
+const buildSlugCandidates = (value: string): string[] => {
+  const normalized = value.trim();
+  const candidates = new Set<string>([
+    normalized,
+    safeDecode(normalized),
+    encodeURIComponent(normalized),
+    normalized.replace(/\+/g, " "),
+  ]);
+
+  return Array.from(candidates).filter(Boolean);
+};
+
+const findGuideBySlug = async (slug: string): Promise<GuideRow | null> => {
+  if (!supabase) return null;
+
+  const candidates = buildSlugCandidates(slug);
+
+  for (const candidate of candidates) {
+    const { data: v3Data } = await supabase
+      .schema("ghq_guides")
+      .from("guides")
+      .select(GUIDE_SELECT_V3)
+      .eq("slug", candidate)
+      .eq("published", true)
+      .maybeSingle();
+
+    if (v3Data) return v3Data as GuideRow;
+
+    const { data: v1Data } = await supabase
+      .schema("ghq_guides")
+      .from("guides")
+      .select(GUIDE_SELECT_V1)
+      .eq("slug", candidate)
+      .eq("published", true)
+      .maybeSingle();
+
+    if (v1Data) return v1Data as GuideRow;
+  }
+
+  return null;
+};
+
+const findGuideArticleBySlug = async (guideId: string, articleSlug: string): Promise<ArticleRow | null> => {
+  if (!supabase) return null;
+
+  const candidates = buildSlugCandidates(articleSlug);
+
+  for (const candidate of candidates) {
+    const { data: v2Data } = await supabase
+      .schema("ghq_guides")
+      .from("articles")
+      .select(ARTICLE_SELECT_V2)
+      .eq("guide_id", guideId)
+      .eq("slug", candidate)
+      .eq("published", true)
+      .maybeSingle();
+
+    if (v2Data) return v2Data as ArticleRow;
+
+    const { data: v1Data } = await supabase
+      .schema("ghq_guides")
+      .from("articles")
+      .select(ARTICLE_SELECT_V1)
+      .eq("guide_id", guideId)
+      .eq("slug", candidate)
+      .eq("published", true)
+      .maybeSingle();
+
+    if (v1Data) return v1Data as ArticleRow;
+  }
+
+  return null;
+};
+
 const toGuide = (row: GuideRow): Guide => ({
   id: row.id,
   title: row.title,
   slug: row.slug,
   description: row.description ?? "",
   cover_image: row.cover_image,
+  overview_banner_image: row.overview_banner_image,
   order_index: Number(row.order_index ?? 0),
   category: row.category,
   audience_market: row.audience_market ?? null,
@@ -150,27 +234,7 @@ export const getGuideOverviewBySlug = async (slug: string): Promise<GuideOvervie
     return { guide: null, sections: [], articles: [], source: "mock" };
   }
 
-  const { data: guideData, error: guideError } = await supabase
-    .schema("ghq_guides")
-    .from("guides")
-    .select(GUIDE_SELECT_V3)
-    .eq("slug", slug)
-    .eq("published", true)
-    .maybeSingle();
-
-  const safeGuideData = guideData
-    ? guideData
-    : (
-        guideError
-          ? await supabase
-              .schema("ghq_guides")
-              .from("guides")
-              .select(GUIDE_SELECT_V1)
-              .eq("slug", slug)
-              .eq("published", true)
-              .maybeSingle()
-          : { data: null }
-      ).data;
+  const safeGuideData = await findGuideBySlug(slug);
 
   if (!safeGuideData) {
     return { guide: null, sections: [], articles: [], source: "mock" };
@@ -246,27 +310,9 @@ export const getGuideArticleBySlugs = async (
     };
   }
 
-  const { data: guideData, error: guideError } = await supabase
-    .schema("ghq_guides")
-    .from("guides")
-    .select(GUIDE_SELECT_V3)
-    .eq("slug", guideSlug)
-    .eq("published", true)
-    .maybeSingle();
+  const currentGuideData = await findGuideBySlug(guideSlug);
 
-  const currentGuideData = guideData
-    ? guideData
-    : (
-        await supabase
-          .schema("ghq_guides")
-          .from("guides")
-          .select(GUIDE_SELECT_V1)
-          .eq("slug", guideSlug)
-          .eq("published", true)
-          .maybeSingle()
-      ).data;
-
-  if (guideError || !currentGuideData) {
+  if (!currentGuideData) {
     return {
       guide: null,
       section: null,
@@ -282,15 +328,7 @@ export const getGuideArticleBySlugs = async (
 
   const guide = toGuide(currentGuideData as GuideRow);
 
-  const [{ data: articleData, error: articleError }, { data: allArticlesData, error: allArticlesError }, { data: sectionsData }, { data: relatedData }] = await Promise.all([
-    supabase
-      .schema("ghq_guides")
-      .from("articles")
-      .select(ARTICLE_SELECT_V2)
-      .eq("guide_id", guide.id)
-      .eq("slug", articleSlug)
-      .eq("published", true)
-      .maybeSingle(),
+  const [{ data: allArticlesData, error: allArticlesError }, { data: sectionsData }, { data: relatedData }, articleData] = await Promise.all([
     supabase
       .schema("ghq_guides")
       .from("articles")
@@ -311,22 +349,9 @@ export const getGuideArticleBySlugs = async (
       .eq("category", guide.category ?? "")
       .neq("id", guide.id)
       .limit(3),
+    findGuideArticleBySlug(guide.id, articleSlug),
   ]);
-
-  const safeArticleData = articleData
-    ? articleData
-    : (
-        articleError
-          ? await supabase
-              .schema("ghq_guides")
-              .from("articles")
-              .select(ARTICLE_SELECT_V1)
-              .eq("guide_id", guide.id)
-              .eq("slug", articleSlug)
-              .eq("published", true)
-              .maybeSingle()
-          : { data: null }
-      ).data;
+  const safeArticleData = articleData;
 
   const safeAllArticlesData = allArticlesData
     ? allArticlesData

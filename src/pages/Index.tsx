@@ -32,14 +32,14 @@ const ECOSYSTEM_AREAS = [
   },
   {
     id: "design-reviews",
-    title: "Design Reviews",
-    description: "Get clear, practical feedback on your design work. (Service page coming soon)",
+    title: "Design Mistakes",
+    description: "Get human-powered feedback for your design work.)",
     href: "/mistakes",
     icon: PenLine,
   },
   {
     id: "blog-topics",
-    title: "Blog Topics",
+    title: "What's Hip",
     description: "Practical tips and explainers. For now, discover content through search and guides.",
     href: "/search",
     icon: BookOpen,
@@ -69,10 +69,10 @@ export default function Index() {
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-green">GetHipQuick</p>
           <h1 className="mt-3 max-w-4xl font-display text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
-             Explore microguides, printable resources, and get real design help.
+             Explore MicroGuides, printable resources, and get human feedback on your designs.
           </h1>
           <p className="mt-5 max-w-4xl text-lg text-muted-foreground">
-            Our resources are made for Canva/aspiring creatives, small business owners, entrepreneurs, and nonprofits who haven’t the time (or patience) to take dedicated courses or sift through long docs and manuals. Check out the growing library of articles, microguides, and checklists.
+            Our resources are made for Canva/aspiring creatives, small business owners, entrepreneurs, and nonprofits who haven’t the time (or patience) to take dedicated courses or sift through long docs and manuals. Check out the growing library of articles, MicroGuides, and checklists.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-2">
@@ -81,7 +81,7 @@ export default function Index() {
                 key={item.id}
                 type="button"
                 onClick={() => setAudience(item.id)}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
                   audience === item.id
                     ? "border-brand-green bg-brand-green text-white"
                     : "border-border bg-white text-foreground/80 hover:border-brand-green/50"
@@ -98,7 +98,7 @@ export default function Index() {
         <div className="mb-8 flex items-center justify-between gap-4">
           <h2 className="font-display text-2xl font-semibold text-foreground">Curated for {audience === "all" ? "Everyone" : audience}</h2>
           <Link to="/guides" className="inline-flex items-center gap-1 text-sm font-medium text-brand-green hover:underline">
-            View all guides <ArrowRight className="h-4 w-4" />
+            View all MicroGuides <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 

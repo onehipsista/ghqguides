@@ -44,7 +44,7 @@ export default function SearchPage() {
       <section className="bg-nav">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-green">Global Search</p>
-          <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">Search Mistakes + Guides</h1>
+          <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">Search Design Mistakes + MicroGuides</h1>
 
           <form onSubmit={onSubmit} className="mt-6 flex max-w-xl items-center gap-2">
             <div className="relative flex-1">
@@ -72,7 +72,7 @@ export default function SearchPage() {
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {!normalizedQ && (
           <div className="rounded-lg border bg-card p-5 text-sm text-muted-foreground">
-            Enter a keyword to search across issues, guides, and articles.
+            Enter a keyword to search across Design Mistakes, MicroGuides, and articles.
           </div>
         )}
 
@@ -86,7 +86,7 @@ export default function SearchPage() {
 
             <div className="space-y-8">
               <div>
-                <h2 className="font-display text-xl font-semibold text-foreground">Issues</h2>
+                <h2 className="font-display text-xl font-semibold text-foreground">Design Mistakes</h2>
                 <div className="mt-3 space-y-3">
                   {(data?.issues ?? []).map((issue) => (
                     <article key={issue.id} className="rounded-lg border bg-card p-4">
@@ -98,18 +98,18 @@ export default function SearchPage() {
                       <h3 className="font-semibold text-foreground">{issue.title}</h3>
                       <p className="mt-1 text-sm text-muted-foreground">{previewText(issue.body)}</p>
                       <Link to="/mistakes" className="mt-3 inline-block text-sm font-medium text-brand-green hover:underline">
-                        Open in Mistakes
+                        Open in Design Mistakes
                       </Link>
                     </article>
                   ))}
                   {(data?.issues ?? []).length === 0 && (
-                    <p className="text-sm text-muted-foreground">No issue matches.</p>
+                    <p className="text-sm text-muted-foreground">No design mistake matches.</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <h2 className="font-display text-xl font-semibold text-foreground">Guides</h2>
+                <h2 className="font-display text-xl font-semibold text-foreground">MicroGuides</h2>
                 <div className="mt-3 space-y-3">
                   {(data?.guides ?? []).map((guide) => (
                     <article key={guide.id} className="rounded-lg border bg-card p-4">
@@ -120,12 +120,12 @@ export default function SearchPage() {
                         to={`/guides/${guide.slug}`}
                         className="mt-3 inline-block text-sm font-medium text-brand-green hover:underline"
                       >
-                        Open Guide
+                        Open MicroGuide
                       </Link>
                     </article>
                   ))}
                   {(data?.guides ?? []).length === 0 && (
-                    <p className="text-sm text-muted-foreground">No guide matches.</p>
+                    <p className="text-sm text-muted-foreground">No MicroGuide matches.</p>
                   )}
                 </div>
               </div>

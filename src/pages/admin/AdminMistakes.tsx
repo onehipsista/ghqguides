@@ -96,13 +96,13 @@ export default function AdminMistakesPage() {
   return (
     <Layout>
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="font-display text-2xl font-bold text-foreground">Admin — Design Issues</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground">Admin — Design Mistakes</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Manage publish status for issues in `ghq_guides.design_issues`.
+          Manage publish status for mistakes in `ghq_guides.design_issues`.
         </p>
         <div className="mt-4">
           <Link to="/admin/mistakes/new">
-            <Button>Add New Issue</Button>
+            <Button>Add New Mistake</Button>
           </Link>
         </div>
 

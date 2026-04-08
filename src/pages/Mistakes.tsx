@@ -98,16 +98,31 @@ export default function MistakesPage() {
     });
   }, [data?.issues, search, category, severity]);
 
+  const selectedIndex = useMemo(
+    () => (selected ? filtered.findIndex((issue) => issue.id === selected.id) : -1),
+    [filtered, selected]
+  );
+
+  const handlePrevIssue = () => {
+    if (selectedIndex <= 0) return;
+    setSelected(filtered[selectedIndex - 1]);
+  };
+
+  const handleNextIssue = () => {
+    if (selectedIndex < 0 || selectedIndex >= filtered.length - 1) return;
+    setSelected(filtered[selectedIndex + 1]);
+  };
+
   return (
     <Layout>
       {/* Hero */}
       <section className="bg-nav">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-green">
-            Micro Guides
+            MicroGuides
           </p>
           <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Design <span className="text-brand-green-light">Mistakes</span>
+            <span className="text-brand-green-light">Design</span> Mistakes
           </h1>
           <p className="mt-3 max-w-3xl text-base text-nav-foreground/70">
             A searchable collection of the most frequent design mistakes — with
@@ -118,27 +133,24 @@ export default function MistakesPage() {
           <div className="mt-6 flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-md bg-severity-minor" />
-              <span className="text-sm text-nav-foreground/60">Minor — cosmetic polish</span>
+              <span className="text-sm text-nav-foreground/60">Minor — Cosmetic Polish</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-md bg-severity-moderate" />
-              <span className="text-sm text-nav-foreground/60">Moderate — affects usability</span>
+              <span className="text-sm text-nav-foreground/60">Moderate — Affects Usability</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-md bg-severity-major" />
-              <span className="text-sm text-nav-foreground/60">Major — breaks experience</span>
+              <span className="text-sm text-nav-foreground/60">Major — No Good!</span>
             </div>
           </div>
         </div>
       </section>
 
       <section className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <p className="text-lg leading-relaxed text-foreground/85 sm:text-xl">
-            You don't know what you don't know when you're starting out. Most design mistakes aren't about talent.
-            They're about experience. After reviewing real designs through my Design Check service, the same issues
-            kept showing up. So I started documenting them. Browse the growing collection and get recommendations on
-            what to fix.
+            You don't know what you don't know when you're starting out. Most design mistakes reflect that. After reviewing real designs through my Design Check service, the same issues kept showing up. So I started documenting them. Browse the growing collection and get recommendations on what to fix.
           </p>
         </div>
       </section>
@@ -234,10 +246,10 @@ export default function MistakesPage() {
             <div className="pointer-events-none absolute -right-20 -top-16 h-64 w-64 rounded-full bg-brand-green/10 blur-2xl" />
             <span className="material-symbols-rounded mb-3 inline-flex text-3xl text-brand-green">lock</span>
             <h2 className="font-display text-xl font-bold text-foreground">
-              Unlock All Design Issues
+              Unlock All Design Mistakes
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              You're previewing {Math.min(FREE_CARD_LIMIT, filtered.length)} of {data?.issues?.length ?? 0} issues. Unlock full searchable access and all "How to Fix" solutions.
+              You're previewing {Math.min(FREE_CARD_LIMIT, filtered.length)} of {data?.issues?.length ?? 0} mistakes. Unlock full searchable access and all "How to Fix" solutions.
             </p>
             <Button size="lg" className="mt-4 w-full max-w-sm" onClick={handleUpgrade} disabled={isCheckoutPending}>
               Get Full Access — {guideAccessPriceLabel}
@@ -256,6 +268,10 @@ export default function MistakesPage() {
         hasAccess={hasAccess}
         onUpgrade={handleUpgrade}
         isUpgrading={isCheckoutPending}
+        canPrev={selectedIndex > 0}
+        canNext={selectedIndex >= 0 && selectedIndex < filtered.length - 1}
+        onPrev={handlePrevIssue}
+        onNext={handleNextIssue}
       />
     </Layout>
   );

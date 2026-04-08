@@ -6,13 +6,13 @@ import { adminEmailAllowlist } from "@/lib/supabase";
 
 const cards = [
   {
-    title: "Design Issues",
+    title: "Design Mistakes",
     description: "Manage mistakes, publishing, and order.",
     href: "/admin/mistakes",
   },
   {
-    title: "Guides",
-    description: "Create and edit guide metadata.",
+    title: "MicroGuides",
+    description: "Create and edit MicroGuide metadata.",
     href: "/admin/guides",
   },
   {
@@ -21,8 +21,8 @@ const cards = [
     href: "/admin/products",
   },
   {
-    title: "Blog",
-    description: "Write and publish blog posts, manage categories.",
+    title: "What's Hip",
+    description: "Write and publish What's Hip posts, manage categories.",
     href: "/admin/blog",
   },
   {

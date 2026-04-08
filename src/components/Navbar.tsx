@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Search, Shield, SquareArrowOutUpRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAccessState } from "@/lib/access";
 import { adminEmailAllowlist } from "@/lib/supabase";
@@ -11,9 +11,9 @@ import { useAuth } from "@/hooks/use-auth";
 
 const baseNavLinks = [
   { label: "Design Mistakes", href: "/mistakes" },
-  { label: "Guide Library", href: "/guides" },
-  { label: "Shop", href: "/shop" },
-  { label: "Blog", href: "/blog" },
+  { label: "MicroGuides", href: "/guides" },
+  { label: "Resource Shop", href: "/shop" },
+  { label: "What's Hip", href: "/blog" },
 ];
 
 const externalNavLinks = [
@@ -37,9 +37,7 @@ export function Navbar() {
   const isAdmin = isAdminByRole || isAdminByAllowlist;
   const loginHref = `/login?redirect=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`;
 
-  const navLinks = isAdmin
-    ? [...baseNavLinks, { label: "Admin", href: "/admin" }]
-    : baseNavLinks;
+  const navLinks = baseNavLinks;
 
   const handleSignOut = async () => {
     if (!supabase) return;
@@ -77,9 +75,10 @@ export function Navbar() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md px-3 py-2 text-sm font-medium text-nav-foreground/70 transition-colors hover:text-nav-foreground"
+                className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-nav-foreground/70 transition-colors hover:text-nav-foreground"
               >
                 {link.label}
+                <SquareArrowOutUpRight className="h-3.5 w-3.5" />
               </a>
             ))}
           </div>
@@ -100,6 +99,20 @@ export function Navbar() {
                 <Search className="h-4 w-4" />
               </Button>
             </Link>
+
+            {isAdmin && (
+              <Link to="/admin" className="hidden lg:inline-flex">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-nav-foreground/75 hover:bg-white/5 hover:text-nav-foreground"
+                >
+                  <Shield className="h-4 w-4" />
+                  Admin
+                </Button>
+              </Link>
+            )}
+
             {isAuthenticated ? (
               <Button
                 variant="outline"
@@ -161,11 +174,23 @@ export function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileOpen(false)}
-                className="block rounded-md px-3 py-2 text-base font-medium text-nav-foreground/70 transition-colors hover:bg-white/5 hover:text-nav-foreground"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-nav-foreground/70 transition-colors hover:bg-white/5 hover:text-nav-foreground"
               >
                 {link.label}
+                <SquareArrowOutUpRight className="h-4 w-4" />
               </a>
             ))}
+
+            {isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-nav-foreground/70 transition-colors hover:bg-white/5 hover:text-nav-foreground"
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
 
             <Link
               to="/search"

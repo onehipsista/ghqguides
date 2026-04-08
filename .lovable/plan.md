@@ -3,7 +3,7 @@
 # GHQ Microlearning Site — Full Build Plan
 
 ## Overview
-A mobile-first microlearning platform at `guides.gethipquick.com` with two content sections (Common Design Mistakes + Micro Guides), a shared paywall, and an admin panel — all powered by Supabase.
+A mobile-first microlearning platform at `guides.gethipquick.com` with two content sections (Design Mistakes + MicroGuides), a shared paywall, and an admin panel — all powered by Supabase.
 
 ---
 
@@ -27,7 +27,7 @@ A mobile-first microlearning platform at `guides.gethipquick.com` with two conte
 - Password reset flow with `/reset-password` page
 
 ### 4. Mistakes Public Page (`/mistakes`)
-- **Hero section**: dark bg, "MICRO GUIDES" label, "Common Design Issues" heading, subtitle, severity legend (green/yellow/red dots)
+- **Hero section**: dark bg, "MICROGUIDES" label, "Common Design Issues" heading, subtitle, severity legend (green/yellow/red dots)
 - **Search bar** filtering by title and body
 - **Filter pills**: category row (All Categories, Typography, Color, Spacing, etc.) + severity row (All, Minor, Moderate, Major)
 - **Card grid** (3 columns desktop, 1 mobile): severity badge, category label, title, body (3-line clamp), favorite heart toggle
@@ -50,7 +50,7 @@ A mobile-first microlearning platform at `guides.gethipquick.com` with two conte
 
 ---
 
-## Phase 2 — Micro Guides
+## Phase 2 — MicroGuides
 
 ### 7. Guides Database
 - Create tables: `guides`, `sections`, `articles`

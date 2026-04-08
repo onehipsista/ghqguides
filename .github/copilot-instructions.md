@@ -2,13 +2,14 @@
 ### *guides.gethipquick.com*
 
 ---
+When working on complex tasks, proceed with all necessary file changes and terminal commands without pausing for incremental confirmation. I will review the final diff and rollback if needed.
 
 ## What You're Building
 
 A mobile-first, searchable microlearning platform on `guides.gethipquick.com` — two sections under one roof:
 
 1. **Common Design Mistakes** — filterable card grid (already prototyped and partially built in WP)
-2. **Micro Guides** — short structured guides with a library, TOC, and article navigation
+2. **MicroGuides** — short structured guides with a library, TOC, and article navigation
 
 Both sections share Supabase auth and a single Stripe paywall. You manage all content through a simple **admin panel** — no touching Supabase directly, ever.
 

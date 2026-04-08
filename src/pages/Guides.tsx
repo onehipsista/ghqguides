@@ -46,10 +46,10 @@ export default function GuidesPage() {
       <section className="bg-nav">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-green">
-            Micro Guides
+            MicroGuides
           </p>
           <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Guide Library
+            <span className="text-brand-green-light">MicroGuides</span> Library
           </h1>
           <p className="mt-3 max-w-2xl text-base text-nav-foreground/70">
             Practical mini-guides you can read fast and apply immediately.
@@ -82,7 +82,7 @@ export default function GuidesPage() {
       </section>
 
       <section className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <p className="text-lg leading-relaxed text-foreground/85 sm:text-xl">
             MicroGuides deliver clear, useful information you can apply quickly. No degree required. Short reads on
             graphic design, marketing, and nonprofit communications. Practical insights you can use right away.
@@ -104,7 +104,7 @@ export default function GuidesPage() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filteredGuides.map((guide) => (
             <article key={guide.id} className="overflow-hidden rounded-xl border bg-card">
-              <Link to={`/guides/${guide.slug}`} className="block aspect-[16/9] w-full bg-muted">
+              <Link to={`/guides/${encodeURIComponent(guide.slug)}`} className="block aspect-[16/9] w-full bg-muted">
                 {guide.cover_image ? (
                   <img
                     src={getVersionedMediaUrl(guide.cover_image, guide.updated_at)}
@@ -131,7 +131,7 @@ export default function GuidesPage() {
                 </div>
 
                 <h2 className="font-display text-xl font-bold tracking-[-0.01em] text-foreground">
-                  <Link to={`/guides/${guide.slug}`} className="hover:text-brand-green hover:underline">
+                  <Link to={`/guides/${encodeURIComponent(guide.slug)}`} className="hover:text-brand-green hover:underline">
                     {guide.title}
                   </Link>
                 </h2>
@@ -151,7 +151,7 @@ export default function GuidesPage() {
                 <p className="mt-3 line-clamp-3 text-sm text-foreground/85">{guide.description}</p>
 
                 <Link
-                  to={`/guides/${guide.slug}`}
+                  to={`/guides/${encodeURIComponent(guide.slug)}`}
                   className="mt-4 inline-flex rounded-[2px] border border-brand-green bg-white px-3 py-2 text-sm font-medium text-brand-teal transition-colors hover:bg-brand-green/10"
                 >
                   Read Guide

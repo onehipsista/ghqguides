@@ -2,14 +2,19 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Clock, Share2, Tag } from "lucide-react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { getPublicPostBySlug, getRelatedPosts } from "@/lib/posts";
+import { getAdjacentPostsInCategory, getPrimaryPostCategory, getPublicPostBySlug, getRelatedPosts } from "@/lib/posts";
 
 const looksLikeHtml = (value: string) => /<\/?[a-z][\s\S]*>/i.test(value);
+const safeFormatDate = (value: string | null | undefined, pattern: string) => {
+  if (!value) return null;
+  const date = new Date(value);
+  return isValid(date) ? format(date, pattern) : null;
+};
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -27,9 +32,15 @@ export default function BlogPostPage() {
     enabled: Boolean(slug) && Boolean(post),
   });
 
+  const { data: postNav } = useQuery({
+    queryKey: ["post-nav", slug, post?.category],
+    queryFn: () => getAdjacentPostsInCategory(slug as string, post?.category ?? null),
+    enabled: Boolean(slug) && Boolean(post),
+  });
+
   const normalizedContent = post?.content?.replace(/\\n/g, "\n") ?? "";
   const contentIsHtml = looksLikeHtml(normalizedContent);
-  const isGraphicDesign = (post?.category ?? "").toLowerCase().includes("graphic design");
+  const primaryCategory = getPrimaryPostCategory(post?.category);
 
   if (isLoading) {
     return (
@@ -47,7 +58,7 @@ export default function BlogPostPage() {
         <div className="mx-auto max-w-3xl px-4 py-20 text-center">
           <p className="text-lg text-muted-foreground">Post not found.</p>
           <Link to="/blog" className="mt-4 inline-block text-sm text-brand-green hover:underline">
-            ← Back to Blog
+            ← Back to What's Hip
           </Link>
         </div>
       </Layout>
@@ -78,21 +89,76 @@ export default function BlogPostPage() {
 
   return (
     <Layout>
+      <section className="sticky top-16 z-40 border-b bg-brand-green">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
+          <Link to="/blog" className="text-xs font-medium text-white hover:underline">
+            ← What's Hip
+          </Link>
+          <div className="flex items-center gap-2">
+            {postNav?.previous ? (
+              <Link
+                to={`/blog/${postNav.previous.slug}`}
+                className="rounded-md border border-white/30 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-white/10"
+              >
+                Previous
+              </Link>
+            ) : (
+              <span className="rounded-md border border-white/15 px-2.5 py-1 text-xs text-white/60">Previous</span>
+            )}
+
+            {postNav?.next ? (
+              <Link
+                to={`/blog/${postNav.next.slug}`}
+                className="rounded-md border border-white/30 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-white/10"
+              >
+                Next
+              </Link>
+            ) : (
+              <span className="rounded-md border border-white/15 px-2.5 py-1 text-xs text-white/60">Next</span>
+            )}
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         {/* Breadcrumbs */}
-        <nav className="mb-4 text-sm text-muted-foreground">
+        <nav className="mb-4 flex flex-wrap items-center gap-y-1 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-foreground">Home</Link>
           <span className="mx-2">&gt;</span>
-          <Link to="/blog" className="hover:text-foreground">Blog</Link>
-          {post.category && (
+          <Link to="/blog" className="hover:text-foreground">What's Hip</Link>
+          {primaryCategory && (
             <>
               <span className="mx-2">&gt;</span>
-              <span>{post.category}</span>
+              <span className="break-words">{primaryCategory}</span>
             </>
           )}
           <span className="mx-2">&gt;</span>
-          <span className="text-foreground">{post.title}</span>
+          <span className="break-words text-foreground">{post.title}</span>
         </nav>
+
+        <div className="mb-6 flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+          {postNav?.previous ? (
+            <Link
+              to={`/blog/${postNav.previous.slug}`}
+              className="text-sm font-medium text-brand-green hover:underline"
+            >
+              ← {postNav.previous.title}
+            </Link>
+          ) : (
+            <span className="text-sm text-muted-foreground">Start of category</span>
+          )}
+
+          {postNav?.next ? (
+            <Link
+              to={`/blog/${postNav.next.slug}`}
+              className="text-sm font-medium text-brand-green hover:underline"
+            >
+              Next: {postNav.next.title} →
+            </Link>
+          ) : (
+            <span className="text-sm text-muted-foreground">End of category</span>
+          )}
+        </div>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
           <article className="rounded-xl border bg-card p-6 sm:p-10">
@@ -100,16 +166,18 @@ export default function BlogPostPage() {
             {/* Back */}
             <Link
               to="/blog"
-              className="mb-8 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="mb-6 block w-fit text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Blog
+              <span className="inline-flex items-center gap-1.5">
+                <ArrowLeft className="h-4 w-4" />
+                Back to What's Hip
+              </span>
             </Link>
 
             {/* Category badge */}
-            {post.category && (
-              <span className="mb-4 inline-block rounded-full bg-brand-green/10 px-2.5 py-0.5 text-xs font-semibold text-brand-green">
-                {post.category}
+            {primaryCategory && (
+              <span className="mb-4 inline-block text-[11px] font-bold uppercase tracking-[0.16em] text-brand-green">
+                {primaryCategory}
               </span>
             )}
 
@@ -125,10 +193,10 @@ export default function BlogPostPage() {
                   <Clock className="h-4 w-4" />
                   {post.reading_time_minutes} min read
                 </span>
-                {post.published_at && (
+                {safeFormatDate(post.published_at, "MMMM d, yyyy") && (
                   <span className="flex items-center gap-1.5">
                     <Calendar className="h-4 w-4" />
-                    {format(new Date(post.published_at), "MMMM d, yyyy")}
+                    {safeFormatDate(post.published_at, "MMMM d, yyyy")}
                   </span>
                 )}
                 {post.author && (
@@ -160,7 +228,7 @@ export default function BlogPostPage() {
 
             {/* TLDR */}
             {post.tldr && (
-              <div className="mb-8 rounded-lg border border-brand-green/30 bg-brand-green/5 px-5 py-4">
+              <div className="mb-8 mt-6 rounded-lg border border-brand-green/30 bg-brand-green/5 px-5 py-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand-green">TLDR</p>
                 <p className="mt-1 text-lg font-bold leading-snug text-foreground">{post.tldr}</p>
               </div>
@@ -176,10 +244,10 @@ export default function BlogPostPage() {
             </div>
 
             {/* Tags */}
-            {post.tags.length > 0 && (
+            {(post.tags ?? []).length > 0 && (
               <div className="mt-10 flex flex-wrap items-center gap-2 border-t pt-6">
                 <Tag className="h-4 w-4 text-muted-foreground" />
-                {post.tags.map((tag) => (
+                {(post.tags ?? []).map((tag) => (
                   <span
                     key={tag}
                     className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground"
@@ -189,12 +257,21 @@ export default function BlogPostPage() {
                 ))}
               </div>
             )}
+
+            {postNav?.next && (
+              <div className="mt-8 border-t pt-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-green">Next Article</p>
+                <Link to={`/blog/${postNav.next.slug}`} className="mt-2 inline-block text-sm font-semibold text-foreground hover:text-brand-green">
+                  {postNav.next.title} →
+                </Link>
+              </div>
+            )}
           </article>
 
           <aside className="space-y-4">
             {related.length > 0 && (
               <div className="rounded-xl border bg-card p-4">
-                <h2 className="font-display text-base font-bold text-foreground">More in this category</h2>
+                <h2 className="font-display text-base font-bold text-brand-green">In This Category</h2>
                 <ul className="mt-3 space-y-3">
                   {related.map((item) => (
                     <li key={item.id}>
@@ -211,21 +288,26 @@ export default function BlogPostPage() {
             )}
 
             <div className="rounded-xl border border-brand-green/30 bg-brand-green/5 p-4">
-              <h3 className="font-display text-base font-bold text-foreground">Keep learning</h3>
+              <h3 className="font-display text-base font-bold text-foreground">Keep Learning</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                {isGraphicDesign
-                  ? "For graphic design topics, continue with full guides or run a Design Check review."
-                  : "Explore the guide library for deeper walkthroughs and practical examples."}
+                Explore the MicroGuides library for quick resources to level up.
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3">
                 <Link to="/guides">
-                  <Button size="sm" variant="outline">View Guides</Button>
+                  <Button size="sm" variant="outline">View MicroGuides</Button>
                 </Link>
-                {isGraphicDesign && (
-                  <Link to="/mistakes">
-                    <Button size="sm">Design Check</Button>
-                  </Link>
-                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-brand-green/30 bg-brand-green/5 p-4">
+              <h3 className="font-display text-base font-bold text-foreground">Get a Design Check</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Human-powered feedback from a design professional to help you improve.
+              </p>
+              <div className="mt-3">
+                <a href="https://app.gethipquick.com" target="_blank" rel="noopener noreferrer">
+                  <Button size="sm">Open Design Check</Button>
+                </a>
               </div>
             </div>
           </aside>

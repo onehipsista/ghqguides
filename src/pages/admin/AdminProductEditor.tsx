@@ -58,8 +58,8 @@ const DEFAULT_STATE: ProductFormState = {
   featured: false,
   published: false,
   order_index: "0",
-  grants_guide_access: false,
-  access_scope: "downloads",
+  grants_guide_access: true,
+  access_scope: "guides_plus_mistakes",
   tags_csv: "",
 };
 

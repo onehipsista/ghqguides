@@ -46,9 +46,9 @@ export default function ShopPage() {
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-green">
             GetHipQuick Shop
           </p>
-          <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">Resource Shop</h1>
+          <h1 className="font-display text-3xl font-bold text-white sm:text-4xl"><span className="text-brand-green-light">Resource</span> Shop</h1>
           <p className="mt-3 max-w-2xl text-base text-nav-foreground/70">
-            Printable PDF versions of your guides and practical templates you can use right away.
+            Download printable PDF versions of MicroGuides and practical Checklists you can use right away.
           </p>
 
           <div className="mt-6 flex max-w-3xl flex-col gap-3 sm:flex-row">
@@ -66,7 +66,7 @@ export default function ShopPage() {
               value={categoryFilter}
               onChange={(event) => setCategoryFilter(event.target.value)}
             >
-              <option value="all" className="text-foreground">All categories</option>
+              <option value="all" className="text-foreground">All Categories</option>
               {categories.map((category) => (
                 <option key={category} value={category ?? ""} className="text-foreground">
                   {category}
@@ -84,7 +84,7 @@ export default function ShopPage() {
 
         {isError && (
           <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-            We couldn't load products right now.
+            We couldn't load products. Please check back.
           </div>
         )}
 
@@ -95,7 +95,7 @@ export default function ShopPage() {
                 {(product.shop_thumbnail_url || product.image_url) ? (
                   <img src={product.shop_thumbnail_url || product.image_url || ""} alt={product.title} className="h-full w-full object-cover" loading="lazy" />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No image</div>
+                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No Image</div>
                 )}
               </Link>
               <div className="p-4">

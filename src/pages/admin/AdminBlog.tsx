@@ -1,18 +1,23 @@
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, OctagonMinus, Pencil, Trash2, Upload } from "lucide-react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { getAccessState } from "@/lib/access";
 import { adminEmailAllowlist } from "@/lib/supabase";
-import { BLOG_TAXONOMY } from "@/lib/blog-taxonomy";
 import {
   deleteAdminPost,
   duplicateAdminPost,
   getAdminPosts,
   saveAdminPost,
 } from "@/lib/admin-posts";
+
+const safeFormatDate = (value: string | null | undefined, pattern: string) => {
+  if (!value) return "—";
+  const date = new Date(value);
+  return isValid(date) ? format(date, pattern) : "—";
+};
 
 export default function AdminBlogPage() {
   const location = useLocation();
@@ -65,20 +70,16 @@ export default function AdminBlogPage() {
   return (
     <Layout>
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="font-display text-2xl font-bold text-foreground">Admin — Blog</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage posts, publishing, and blog categories.
-            </p>
+            <h1 className="font-display text-2xl font-bold text-foreground">Admin — What's Hip</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Manage posts, publishing, and What's Hip categories.</p>
           </div>
           <Link to="/admin/blog/new">
             <Button>New Post</Button>
           </Link>
         </div>
 
-        {/* Posts table */}
         <div className="mt-6 overflow-hidden rounded-xl border bg-card">
           {isLoading ? (
             <div className="p-4 text-sm text-muted-foreground">Loading posts...</div>
@@ -109,7 +110,7 @@ export default function AdminBlogPage() {
                     <td className="px-4 py-3 text-sm text-muted-foreground">{post.category ?? "—"}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground">{post.reading_time_minutes} min</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground">
-                      {post.published_at ? format(new Date(post.published_at), "MMM d, yyyy") : "—"}
+                      {safeFormatDate(post.published_at, "MMM d, yyyy")}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       {post.status === "published" ? (
@@ -179,27 +180,6 @@ export default function AdminBlogPage() {
               </tbody>
             </table>
           )}
-        </div>
-
-        {/* Blog taxonomy (section-specific) */}
-        <div className="mt-10">
-          <h2 className="font-display text-lg font-semibold text-foreground">Blog Taxonomy</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            This is blog-only taxonomy (separate from Products, Guides, and Mistakes).
-          </p>
-
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {BLOG_TAXONOMY.map((group) => (
-              <div key={group.label} className="rounded-lg border bg-card p-4">
-                <h3 className="text-sm font-semibold text-foreground">{group.label}</h3>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {group.values.map((value) => (
-                    <li key={value}>{value}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
     </Layout>

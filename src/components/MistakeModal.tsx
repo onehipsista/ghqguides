@@ -17,6 +17,10 @@ interface MistakeModalProps {
   hasAccess?: boolean;
   onUpgrade?: () => void;
   isUpgrading?: boolean;
+  canPrev?: boolean;
+  canNext?: boolean;
+  onPrev?: () => void;
+  onNext?: () => void;
 }
 
 export function MistakeModal({
@@ -26,6 +30,10 @@ export function MistakeModal({
   hasAccess = false,
   onUpgrade,
   isUpgrading = false,
+  canPrev = false,
+  canNext = false,
+  onPrev,
+  onNext,
 }: MistakeModalProps) {
   if (!issue) return null;
 
@@ -70,6 +78,15 @@ export function MistakeModal({
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="flex items-center justify-between border-t pt-3">
+            <Button type="button" variant="outline" size="sm" onClick={onPrev} disabled={!canPrev}>
+              Previous
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={onNext} disabled={!canNext}>
+              Next
+            </Button>
           </div>
         </div>
       </DialogContent>

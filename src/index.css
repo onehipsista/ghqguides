@@ -118,6 +118,16 @@
     @apply bg-background text-foreground font-sans;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   .guide-article-content p {
     margin: 0.75rem 0;
   }

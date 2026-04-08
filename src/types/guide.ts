@@ -4,6 +4,7 @@ export interface Guide {
   slug: string;
   description: string;
   cover_image: string | null;
+  overview_banner_image: string | null;
   order_index: number;
   category: string | null;
   audience_market: string | null;

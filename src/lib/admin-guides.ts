@@ -8,6 +8,7 @@ export interface AdminGuideInput {
   slug: string;
   description: string;
   cover_image: string | null;
+  overview_banner_image: string | null;
   category: string | null;
   audience_market: string | null;
   level: string | null;
@@ -35,6 +36,7 @@ interface GuideRow {
   slug: string;
   description: string | null;
   cover_image: string | null;
+  overview_banner_image: string | null;
   order_index?: number | null;
   category: string | null;
   audience_market?: string | null;
@@ -68,9 +70,9 @@ interface ArticleRow {
 }
 
 const GUIDE_SELECT_V3 =
-  "id, title, slug, description, cover_image, order_index, category, audience_market, level, material_symbol, featured, published, updated_at";
+  "id, title, slug, description, cover_image, overview_banner_image, order_index, category, audience_market, level, material_symbol, featured, published, updated_at";
 const GUIDE_SELECT_V2 =
-  "id, title, slug, description, cover_image, category, audience_market, level, material_symbol, featured, published, updated_at";
+  "id, title, slug, description, cover_image, overview_banner_image, category, audience_market, level, material_symbol, featured, published, updated_at";
 const GUIDE_SELECT_V1 = "id, title, slug, description, cover_image, category, featured, published, updated_at";
 
 const ARTICLE_SELECT_V2 =
@@ -91,6 +93,7 @@ const toGuide = (row: GuideRow): Guide => ({
   slug: row.slug,
   description: row.description ?? "",
   cover_image: row.cover_image,
+  overview_banner_image: row.overview_banner_image,
   order_index: Number(row.order_index ?? 0),
   category: row.category,
   audience_market: row.audience_market ?? null,
@@ -196,6 +199,7 @@ export const saveAdminGuide = async (input: AdminGuideInput): Promise<void> => {
     slug: input.slug,
     description: input.description,
     cover_image: input.cover_image,
+    overview_banner_image: input.overview_banner_image,
     category: input.category,
     audience_market: input.audience_market,
     level: input.level,

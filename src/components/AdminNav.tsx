@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 
 const adminLinks = [
   { label: "Dashboard", href: "/admin" },
-  { label: "Issues", href: "/admin/mistakes" },
-  { label: "Guides", href: "/admin/guides" },
-  { label: "Blog", href: "/admin/blog" },
+  { label: "Design Mistakes", href: "/admin/mistakes" },
+  { label: "MicroGuides", href: "/admin/guides" },
+  { label: "What's Hip", href: "/admin/blog" },
   { label: "Products", href: "/admin/products" },
   { label: "Users", href: "/admin/users" },
 ];

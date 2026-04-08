@@ -23,12 +23,21 @@ function looksLikeHtml(value: string) {
   return /<\/?[a-z][\s\S]*>/i.test(value);
 }
 
+const decodeParam = (value: string | undefined): string => {
+  if (!value) return "";
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 export default function GuideArticlePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
-  const guideSlug = params.slug ?? "";
-  const articleSlug = params.articleSlug ?? "";
+  const guideSlug = decodeParam(params.slug);
+  const articleSlug = decodeParam(params.articleSlug);
   const [mobileTocOpen, setMobileTocOpen] = useState(false);
 
   const { data: accessState } = useQuery({
@@ -123,7 +132,7 @@ export default function GuideArticlePage() {
       <section className="sticky top-16 z-40 border-b bg-brand-green">
         <div className="mx-auto max-w-4xl px-4 py-2 sm:px-6 lg:px-8">
           <Link to="/guides" className="text-xs font-medium text-white hover:underline">
-            ← Guide Library
+            ← MicroGuides
           </Link>
         </div>
       </section>
@@ -167,7 +176,7 @@ export default function GuideArticlePage() {
           <div className="py-16 text-center">
             <h1 className="font-display text-2xl font-semibold text-foreground">Guide not found</h1>
             <Link to="/guides" className="mt-4 inline-block text-sm font-medium text-brand-green hover:underline">
-              Back to Guide Library
+              Back to MicroGuides
             </Link>
           </div>
         )}
@@ -433,7 +442,7 @@ export default function GuideArticlePage() {
                     <Link
                       key={relatedGuide.id}
                       to={`/guides/${relatedGuide.slug}`}
-                      className="rounded-[2px] bg-card/70 p-3 transition-colors hover:bg-brand-green/10"
+                      className="rounded-[2px] p-3 transition-colors"
                     >
                       <p className="text-xs font-semibold uppercase tracking-wide text-brand-green">{relatedGuide.category ?? "General"}</p>
                       <p className="mt-1 text-sm font-semibold text-foreground">{relatedGuide.title}</p>
